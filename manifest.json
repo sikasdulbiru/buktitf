@@ -1,17 +1,39 @@
 {
-  "name": "Bukti Transfer Laku Pandai",
-  "short_name": "BuktiTF",
-  "description": "Scan & cetak bukti transfer untuk agen Laku Pandai",
+  "name": "Bukti Transfer KIKI CELLULER",
+  "short_name": "BuktiTransfer",
+  "description": "Scan bukti transfer → isi otomatis → cetak struk",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#f0f4f2",
   "theme_color": "#0097a7",
-  "orientation": "portrait",
   "icons": [
     {
-      "src": "https://api.dicebear.com/7.x/icons/svg?seed=laku-pandai&backgroundColor=0097a7",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%230097a7'/><text y='130' x='96' text-anchor='middle' font-size='110'>💳</text></svg>",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "share_target": {
+    "action": "/index.html",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "share_target_files": {
+    "action": "/index.html",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "image",
+          "accept": ["image/jpeg", "image/png", "image/webp", "image/*"]
+        }
+      ]
+    }
+  }
 }

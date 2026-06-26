@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bukti Transfer KIKI CELLULER</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0097a7">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BuktiTransfer">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -236,10 +241,27 @@ body {
     </div>
   </div>
 
+  <!-- Banner install PWA -->
+  <div class="card no-print" id="installBanner" style="display:none; background:#e8f5e9; border-color:#a5d6a7;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div>
+        <strong style="color:#2e7d32;">📲 Pasang sebagai App</strong>
+        <p style="font-size:12px;color:#388e3c;margin-top:3px;">Setelah dipasang, screenshot bukti transfer dari m-banking bisa langsung di-Share ke sini — otomatis ter-scan!</p>
+      </div>
+      <button id="btnInstall" style="background:#2e7d32;color:#fff;border:none;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">Pasang</button>
+    </div>
+  </div>
+
+  <!-- Info cara share (muncul setelah install) -->
+  <div class="card no-print" id="shareInfo" style="display:none; background:#e3f2fd; border-color:#90caf9;">
+    <strong style="color:#1565c0;">✅ App sudah terpasang!</strong>
+    <p style="font-size:12px;color:#1976d2;margin-top:4px;">Cara pakai: Buka m-banking → screenshot bukti transfer → tap <strong>Bagikan / Share</strong> → pilih <strong>BuktiTransfer</strong> → otomatis ter-scan 🎉</p>
+  </div>
+
   <div class="card no-print">
     <div class="tips-box">
       <strong>💡 Tips agar OCR akurat:</strong>
-      Foto dari atas langsung (tidak miring) · Cahaya cukup · Resolusi jelas · File dibuka di browser
+      Foto dari atas langsung (tidak miring) · Cahaya cukup · Resolusi jelas
     </div>
   </div>
 
@@ -276,7 +298,7 @@ body {
           </div>
           <div class="field" style="grid-column:1/-1">
             <label>Status Transaksi</label>
-            <input type="text" id="fStatus" value="Transaksi Berhasil" placeholder="Transfer Berhasil">
+            <input type="text" id="fStatus" value="Transfer Berhasil" placeholder="Transfer Berhasil">
           </div>
           <div class="field">
             <label>Tanggal &amp; Waktu</label>
@@ -415,7 +437,7 @@ body {
             <!-- Footer -->
             <div class="receipt-footer">
               Terima kasih telah menggunakan layanan kami<br>
-              Simpan bukti ini sebagai tanda transaksi yang sah
+              Simpan bukti ini sebagai tanda transaksi sah
             </div>
 
           </div>
@@ -431,7 +453,7 @@ body {
 
   </div><!-- /preview-layout -->
 
-  <div class="footer-note no-print"> · KIKI CELLULER · </div>
+  <div class="footer-note no-print">Bukti Transfer Laku Pandai · Berjalan lokal di browser · Tanpa API Key</div>
 </div>
 
 <!-- Tesseract.js -->
@@ -1133,6 +1155,75 @@ document.getElementById('btnSave').addEventListener('click', async () => {
     btn.disabled = false;
   }
 });
+
+// ══════════════════════════════════════
+// PWA: Service Worker + Install + Share Target
+// ══════════════════════════════════════
+
+// 1. Daftarkan Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    console.log('SW terdaftar:', reg.scope);
+  }).catch(err => console.warn('SW gagal:', err));
+
+  // Terima gambar yang di-share via service worker message
+  navigator.serviceWorker.addEventListener('message', e => {
+    if (e.data && e.data.type === 'SHARED_IMAGE') {
+      const blob = new Blob([e.data.data], { type: e.data.mimeType });
+      const file = new File([blob], e.data.name, { type: e.data.mimeType });
+      // Langsung load dan scan
+      loadFile(file);
+      setTimeout(() => {
+        if (!scanBtn.disabled) scanBtn.click();
+      }, 300);
+    }
+  });
+}
+
+// 2. Tombol Install PWA
+let deferredPrompt = null;
+const installBanner = document.getElementById('installBanner');
+const shareInfo     = document.getElementById('shareInfo');
+
+// Cek apakah sudah terinstall
+if (window.matchMedia('(display-mode: standalone)').matches) {
+  shareInfo.style.display = 'block';
+} else {
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBanner.style.display = 'block';
+  });
+}
+
+document.getElementById('btnInstall').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  installBanner.style.display = 'none';
+  if (outcome === 'accepted') shareInfo.style.display = 'block';
+});
+
+window.addEventListener('appinstalled', () => {
+  installBanner.style.display = 'none';
+  shareInfo.style.display = 'block';
+  deferredPrompt = null;
+});
+
+// 3. Cek URL params dari Web Share Target GET (fallback jika POST tidak bisa)
+// Android bisa share URL gambar via GET params
+const urlParams = new URLSearchParams(window.location.search);
+const sharedUrl = urlParams.get('url') || urlParams.get('text');
+if (sharedUrl && sharedUrl.match(/\.(jpg|jpeg|png|webp)/i)) {
+  fetch(sharedUrl)
+    .then(r => r.blob())
+    .then(blob => {
+      const file = new File([blob], 'shared.jpg', { type: blob.type });
+      loadFile(file);
+      setTimeout(() => { if (!scanBtn.disabled) scanBtn.click(); }, 300);
+    }).catch(() => {});
+}
 </script>
 </body>
 </html>
