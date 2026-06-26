@@ -23,7 +23,16 @@
       "files": [
         {
           "name": "image",
-          "accept": ["image/jpeg", "image/png", "image/webp", "image/*"]
+          "accept": [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp",
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".webp"
+          ]
         }
       ]
     }
