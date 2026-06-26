@@ -1,7 +1,6 @@
-const CACHE = 'bukti-transfer-v1';
-const ASSETS = ['/', '/index.html'];
+const CACHE = 'bukti-transfer-v2';
+const ASSETS = ['/buktitf/', '/buktitf/index.html'];
 
-// Install: cache asset utama
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
@@ -9,40 +8,42 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(self.clients.claim());
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
 });
 
-// Fetch: cache-first untuk asset, network-first untuk yang lain
 self.addEventListener('fetch', e => {
-  // Tangkap POST share target (gambar di-share dari app lain)
-  if (e.request.method === 'POST' && e.request.url.includes('/index.html')) {
+  // Tangkap POST dari Web Share Target (gambar di-share dari app lain)
+  if (e.request.method === 'POST') {
     e.respondWith(
       (async () => {
         const formData = await e.request.formData();
         const image = formData.get('image');
 
-        // Simpan file ke cache sementara pakai IndexedDB-style via client message
-        const client = await self.clients.get(e.clientId) ||
-                        (await self.clients.matchAll())[0];
-
-        if (image && client) {
+        if (image) {
           const arrayBuffer = await image.arrayBuffer();
-          client.postMessage({
-            type: 'SHARED_IMAGE',
-            name: image.name || 'bukti.jpg',
-            mimeType: image.type || 'image/jpeg',
-            data: arrayBuffer
-          }, [arrayBuffer]);
+          // Kirim ke semua client yang aktif
+          const clients = await self.clients.matchAll({ type: 'window' });
+          for (const client of clients) {
+            client.postMessage({
+              type: 'SHARED_IMAGE',
+              name: image.name || 'bukti.jpg',
+              mimeType: image.type || 'image/jpeg',
+              data: arrayBuffer
+            }, [arrayBuffer]);
+          }
         }
 
-        // Redirect ke halaman utama
-        return Response.redirect('/index.html', 303);
+        return Response.redirect('/buktitf/index.html', 303);
       })()
     );
     return;
   }
 
-  // Cache-first untuk asset biasa
+  // Cache-first untuk GET
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );

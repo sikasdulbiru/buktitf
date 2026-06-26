@@ -2,7 +2,8 @@
   "name": "Bukti Transfer KIKI CELLULER",
   "short_name": "BuktiTransfer",
   "description": "Scan bukti transfer → isi otomatis → cetak struk",
-  "start_url": "/index.html",
+  "start_url": "/buktitf/index.html",
+  "scope": "/buktitf/",
   "display": "standalone",
   "background_color": "#f0f4f2",
   "theme_color": "#0097a7",
@@ -15,16 +16,7 @@
     }
   ],
   "share_target": {
-    "action": "/index.html",
-    "method": "GET",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  },
-  "share_target_files": {
-    "action": "/index.html",
+    "action": "/buktitf/index.html",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
