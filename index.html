@@ -147,7 +147,7 @@ body {
   font-size: 13px;
 }
 .receipt-row:last-child { border-bottom: none; }
-.receipt-row .rl { color: #888; flex-shrink: 0; min-width: 100px; }
+.receipt-row .rl { color: #111; flex-shrink: 0; min-width: 100px; }
 .receipt-row .rv { text-align: right; font-weight: 600; color: #111; word-break: break-word; max-width: 55%; }
 
 /* Total admin box */
@@ -180,9 +180,25 @@ body {
   line-height: 1.7;
 }
 
+/* No Ref di top section */
+.receipt-top-ref {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #999;
+}
+.receipt-top-ref span {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #555;
+  word-break: break-all;
+}
+
 /* Print button */
 .btn-print { width:100%; background:#0097a7; color:#fff; border:none; padding:11px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:background .15s; margin-top:12px; }
 .btn-print:hover { background:#00696f; }
+
+
+.thermal-info { font-size:11px; color:#888; text-align:center; margin-top:6px; line-height:1.6; }
 .btn-save { width:100%; background:#fff; color:#0097a7; border:1.5px solid #0097a7; padding:11px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .15s; margin-top:8px; }
 .btn-save:hover { background:#e0f7f8; }
 .btn-save:disabled { border-color:#bbb; color:#bbb; cursor:not-allowed; }
@@ -260,7 +276,7 @@ body {
           </div>
           <div class="field" style="grid-column:1/-1">
             <label>Status Transaksi</label>
-            <input type="text" id="fStatus" value="Transfer Berhasil" placeholder="Transfer Berhasil">
+            <input type="text" id="fStatus" value="Transaksi Berhasil" placeholder="Transfer Berhasil">
           </div>
           <div class="field">
             <label>Tanggal &amp; Waktu</label>
@@ -341,6 +357,7 @@ body {
               <div class="receipt-status" id="rStatus">Transfer Berhasil</div>
               <div class="receipt-datetime" id="rDatetime">—</div>
               <div class="receipt-amount" id="rNominal">IDR 0</div>
+              <div class="receipt-top-ref" id="rTopRefWrap">No. Ref: <span id="rTopRef">—</span></div>
             </div>
 
             <!-- Body rows -->
@@ -377,10 +394,6 @@ body {
                 <span class="rl">Berita</span>
                 <span class="rv" id="rBerita">—</span>
               </div>
-              <div class="receipt-row">
-                <span class="rl">No. Referensi</span>
-                <span class="rv" id="rNoRef" style="font-size:11px;word-break:break-all;">—</span>
-              </div>
             </div>
 
             <!-- Admin & Total box -->
@@ -402,22 +415,23 @@ body {
             <!-- Footer -->
             <div class="receipt-footer">
               Terima kasih telah menggunakan layanan kami<br>
-              Simpan bukti ini sebagai tanda transaksi sah
+              Simpan bukti ini sebagai tanda transaksi yang sah
             </div>
 
           </div>
         </div>
 
         <div class="btn-row">
-          <button class="btn-print no-print" onclick="window.print()">🖨️ Cetak Bukti Transfer</button>
+          <button class="btn-print no-print" onclick="window.print()">🖨️ Cetak via Browser</button>
           <button class="btn-save no-print" id="btnSave">💾 Simpan sebagai Gambar</button>
+
         </div>
       </div>
     </div>
 
   </div><!-- /preview-layout -->
 
-  <div class="footer-note no-print">Bukti Transfer Laku Pandai · Berjalan lokal di browser · Tanpa API Key</div>
+  <div class="footer-note no-print"> · KIKI CELLULER · </div>
 </div>
 
 <!-- Tesseract.js -->
@@ -467,7 +481,7 @@ const rBankPengirim = document.getElementById('rBankPengirim');
 const rBankPenerima = document.getElementById('rBankPenerima');
 const rNamaPengirim = document.getElementById('rNamaPengirim');
 const rBerita       = document.getElementById('rBerita');
-const rNoRef        = document.getElementById('rNoRef');
+const rTopRef       = document.getElementById('rTopRef');
 const rNominalBox   = document.getElementById('rNominalBox');
 const rAdminBox     = document.getElementById('rAdminBox');
 const rTotalBox     = document.getElementById('rTotalBox');
@@ -501,7 +515,7 @@ function updateReceipt() {
   rJenis.textContent        = fJenis.value.trim()        || '—';
   rDariRek.textContent      = fDariRek.value.trim()      || '—';
   rBerita.textContent       = fBerita.value.trim()       || '—';
-  rNoRef.textContent        = fNoRef.value.trim()        || '—';
+  rTopRef.textContent = fNoRef.value.trim() || '—';
 
   // Sembunyikan baris opsional jika kosong
   const np  = fNamaPengirim.value.trim();
@@ -1082,7 +1096,7 @@ scanBtn.addEventListener('click', async ()=>{
 
 updateReceipt();
 
-// ── Simpan sebagai Gambar ──
+
 document.getElementById('btnSave').addEventListener('click', async () => {
   const btn = document.getElementById('btnSave');
   if (typeof html2canvas === 'undefined') {
