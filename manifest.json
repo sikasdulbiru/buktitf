@@ -1,0 +1,17 @@
+{
+  "name": "Bukti Transfer Laku Pandai",
+  "short_name": "BuktiTF",
+  "description": "Scan & cetak bukti transfer untuk agen Laku Pandai",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#f0f4f2",
+  "theme_color": "#0097a7",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://api.dicebear.com/7.x/icons/svg?seed=laku-pandai&backgroundColor=0097a7",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bukti Transfer KIKI CELLULER</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f0f4f2;
+  color: #1a1a1a;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+.container { max-width: 820px; margin: 0 auto; }
+
+/* ── App Header ── */
+.app-header { display:flex; align-items:center; gap:12px; margin-bottom:1.5rem; }
+.app-header-icon { width:44px; height:44px; background:#0097a7; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.app-header h1 { font-size:20px; font-weight:700; color:#00696f; }
+.app-header p  { font-size:13px; color:#666; margin-top:2px; }
+
+.card { background:#fff; border:1px solid #e2e8e5; border-radius:12px; padding:1.25rem; margin-bottom:1rem; }
+.card h2 { font-size:13px; font-weight:600; color:#555; margin-bottom:12px; display:flex; align-items:center; gap:7px; }
+
+/* ── Upload ── */
+.upload-zone { border:2px dashed #80cfd4; border-radius:10px; padding:2rem; text-align:center; cursor:pointer; transition:background .15s,border-color .15s; background:#fafafa; }
+.upload-zone:hover,.upload-zone.drag-over { background:#e6f9fa; border-color:#0097a7; }
+.upload-zone .icon { font-size:32px; display:block; margin-bottom:8px; }
+.upload-zone p  { font-size:14px; color:#555; }
+.upload-zone small { font-size:12px; color:#aaa; }
+#fileInput { display:none; }
+.img-preview { display:none; width:100%; max-height:220px; object-fit:contain; border-radius:8px; background:#f5f5f5; margin-bottom:10px; }
+.img-preview.show { display:block; }
+.change-photo { font-size:12px; color:#0097a7; cursor:pointer; text-decoration:underline; display:none; margin-bottom:10px; }
+
+/* Progress */
+.progress-wrap { display:none; margin-bottom:10px; }
+.progress-wrap.show { display:block; }
+.progress-label { font-size:12px; color:#555; margin-bottom:5px; }
+.progress-bar-bg { height:6px; background:#e0e0e0; border-radius:3px; overflow:hidden; }
+.progress-bar-fill { height:100%; background:#0097a7; border-radius:3px; width:0%; transition:width .3s; }
+
+.status-bar { font-size:12px; padding:8px 12px; border-radius:7px; margin-bottom:10px; display:none; line-height:1.5; }
+.status-bar.success { background:#e0f7f8; color:#005f64; display:block; }
+.status-bar.error   { background:#fff0f0; color:#c0392b; display:block; }
+.status-bar.loading { background:#f5f5f5; color:#555; display:block; }
+.raw-toggle { font-size:12px; color:#0097a7; cursor:pointer; text-decoration:underline; margin-top:6px; display:none; }
+.raw-box    { display:none; margin-top:8px; background:#f5f5f5; border-radius:8px; padding:10px; font-size:11px; font-family:monospace; white-space:pre-wrap; max-height:140px; overflow-y:auto; color:#444; line-height:1.7; }
+
+/* Scan btn */
+.btn-scan { width:100%; background:#0097a7; color:#fff; border:none; padding:11px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:background .15s; margin-top:10px; }
+.btn-scan:hover { background:#00696f; }
+.btn-scan:disabled { background:#bbb; cursor:not-allowed; }
+
+/* Form */
+.fields-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media(max-width:520px){ .fields-grid { grid-template-columns:1fr; } }
+.field { display:flex; flex-direction:column; gap:4px; }
+.field label { font-size:12px; color:#666; font-weight:500; }
+.field input {
+  border:1px solid #d5dbd8; border-radius:8px; padding:8px 11px;
+  font-size:13px; outline:none; background:#fff; color:#1a1a1a;
+  font-family:inherit; transition:border-color .15s;
+}
+.field input:focus { border-color:#0097a7; }
+.field input.auto-filled { background:#e0f7f8; border-color:#4db6bc; }
+.input-prefix-wrap { display:flex; border:1px solid #d5dbd8; border-radius:8px; overflow:hidden; transition:border-color .15s; }
+.input-prefix-wrap span { padding:0 10px; background:#f0f4f2; border-right:1px solid #d5dbd8; font-size:13px; color:#888; display:flex; align-items:center; white-space:nowrap; }
+.input-prefix-wrap input { border:none; padding:8px 11px; font-size:13px; flex:1; outline:none; font-family:inherit; background:transparent; }
+.input-prefix-wrap:focus-within { border-color:#0097a7; }
+.input-prefix-wrap.auto-filled { border-color:#4db6bc; }
+.input-prefix-wrap.auto-filled span { background:#e0f7f8; }
+
+/* Layout 2 kolom */
+.preview-layout { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; align-items:start; }
+@media(max-width:640px){ .preview-layout { grid-template-columns:1fr; } }
+
+/* ════════════════════════════════
+   BUKTI TRANSFER — GAYA MOBILE BANKING
+════════════════════════════════ */
+.receipt-outer { display:flex; justify-content:center; }
+
+.receipt {
+  width: 300px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.12);
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Top section */
+.receipt-top {
+  background: #fff;
+  padding: 24px 20px 16px;
+  text-align: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Nama agen (ganti logo bank) */
+.receipt-agent-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0097a7;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #e0e0e0;
+}
+
+/* Centang hijau */
+.check-circle {
+  width: 60px; height: 60px;
+  background: #0097a7;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 12px;
+}
+.check-circle svg { width: 30px; height: 30px; }
+
+.receipt-status { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 4px; }
+.receipt-datetime { font-size: 12px; color: #888; margin-bottom: 12px; }
+
+/* Nominal besar */
+.receipt-amount {
+  font-size: 26px;
+  font-weight: 800;
+  color: #111;
+  letter-spacing: -0.5px;
+}
+
+/* Rows */
+.receipt-body { padding: 4px 0; }
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 11px 20px;
+  border-bottom: 1px solid #f5f5f5;
+  gap: 12px;
+  font-size: 13px;
+}
+.receipt-row:last-child { border-bottom: none; }
+.receipt-row .rl { color: #888; flex-shrink: 0; min-width: 100px; }
+.receipt-row .rv { text-align: right; font-weight: 600; color: #111; word-break: break-word; max-width: 55%; }
+
+/* Total admin box */
+.receipt-admin-box {
+  margin: 0 20px 12px;
+  background: #f5feff;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  border: 1px solid #b2e8ec;
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.receipt-admin-row {
+  display: flex; justify-content: space-between;
+  font-size: 12.5px; margin: 3px 0;
+}
+.receipt-admin-row .al { color: #555; }
+.receipt-admin-row .av { font-weight: 600; color: #111; }
+.receipt-admin-row.total-row { border-top: 1px dashed #b2e8ec; margin-top: 7px; padding-top: 7px; font-size: 13px; font-weight: 700; }
+.receipt-admin-row.total-row .al { color: #00696f; }
+.receipt-admin-row.total-row .av { color: #00696f; }
+
+/* Footer */
+.receipt-footer {
+  text-align: center;
+  font-size: 11px;
+  color: #aaa;
+  padding: 12px 20px 16px;
+  border-top: 1px dashed #e8e8e8;
+  line-height: 1.7;
+}
+
+/* Print button */
+.btn-print { width:100%; background:#0097a7; color:#fff; border:none; padding:11px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:background .15s; margin-top:12px; }
+.btn-print:hover { background:#00696f; }
+.btn-save { width:100%; background:#fff; color:#0097a7; border:1.5px solid #0097a7; padding:11px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .15s; margin-top:8px; }
+.btn-save:hover { background:#e0f7f8; }
+.btn-save:disabled { border-color:#bbb; color:#bbb; cursor:not-allowed; }
+.btn-row { display:flex; flex-direction:column; gap:0; }
+
+.spinner { width:15px; height:15px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.tips-box { background:#fffbea; border:1px solid #f5e49a; border-radius:8px; padding:10px 14px; font-size:12px; color:#7a6000; line-height:1.7; }
+.tips-box strong { display:block; margin-bottom:4px; }
+.footer-note { text-align:center; font-size:11px; color:#bbb; margin-top:1.5rem; }
+
+/* ═══════════ PRINT ═══════════ */
+@media print {
+  body { background:#fff; padding:0; margin:0; }
+  .no-print { display:none !important; }
+  .receipt-outer { justify-content:flex-start; padding:0; }
+  .receipt { width:72mm; box-shadow:none; border-radius:0; font-size:11px; }
+  .receipt-amount { font-size:20px; }
+  .receipt-row { padding:8px 14px; }
+  .receipt-admin-box { margin:0 14px 10px; }
+  .receipt-top { padding:16px 14px 12px; }
+  @page { size:80mm auto; margin:3mm; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="app-header no-print">
+    <div class="app-header-icon">💳</div>
+    <div>
+      <h1>Bukti Transfer — Laku Pandai</h1>
+      <p>Scan bukti transfer → isi otomatis → cetak untuk nasabah</p>
+    </div>
+  </div>
+
+  <div class="card no-print">
+    <div class="tips-box">
+      <strong>💡 Tips agar OCR akurat:</strong>
+      Foto dari atas langsung (tidak miring) · Cahaya cukup · Resolusi jelas · File dibuka di browser
+    </div>
+  </div>
+
+  <div class="preview-layout">
+
+    <!-- Kiri: Upload + Form -->
+    <div class="no-print">
+      <div class="card">
+        <h2>📷 Upload Bukti Transfer</h2>
+        <img id="previewImg" class="img-preview" src="" alt="Preview">
+        <span class="change-photo" id="changePhoto" onclick="resetUpload()">↩ Ganti foto</span>
+        <div class="upload-zone" id="uploadZone">
+          <span class="icon">📤</span>
+          <p>Klik atau seret foto bukti transfer</p>
+          <small>JPG, PNG, WEBP</small>
+          <input type="file" id="fileInput" accept="image/*">
+        </div>
+        <div class="progress-wrap" id="progressWrap">
+          <div class="progress-label" id="progressLabel">Mempersiapkan...</div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+        </div>
+        <div id="statusBar" class="status-bar"></div>
+        <span class="raw-toggle" id="rawToggle" onclick="toggleRaw()">🔍 Lihat teks mentah OCR</span>
+        <div class="raw-box" id="rawBox"></div>
+        <button class="btn-scan" id="scanBtn" disabled>🔍 Scan &amp; Isi Otomatis</button>
+      </div>
+
+      <div class="card">
+        <h2>✏️ Data Transaksi</h2>
+        <div class="fields-grid">
+          <div class="field" style="grid-column:1/-1">
+            <label>Nama Agen / Outlet (ganti logo bank)</label>
+            <input type="text" id="fNamaAgen" value="KIKI CELLULER" placeholder="Nama Agen Anda">
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>Status Transaksi</label>
+            <input type="text" id="fStatus" value="Transfer Berhasil" placeholder="Transfer Berhasil">
+          </div>
+          <div class="field">
+            <label>Tanggal &amp; Waktu</label>
+            <input type="text" id="fDatetime" placeholder="">
+          </div>
+          <div class="field">
+            <label>Nominal (IDR)</label>
+            <div class="input-prefix-wrap" id="wrapNominal">
+              <span>IDR</span>
+              <input type="text" id="fNominal" placeholder="" inputmode="numeric">
+            </div>
+          </div>
+          <div class="field">
+            <label>Nama Penerima</label>
+            <input type="text" id="fNamaPenerima" placeholder="">
+          </div>
+          <div class="field">
+            <label>Bank Penerima</label>
+            <input type="text" id="fBankPenerima" placeholder="">
+          </div>
+          <div class="field">
+            <label>Rekening Tujuan</label>
+            <input type="text" id="fRekTujuan" placeholder="">
+          </div>
+          <div class="field">
+            <label>Jenis Transaksi</label>
+            <input type="text" id="fJenis" placeholder="">
+          </div>
+          <div class="field">
+            <label>Nama Pengirim</label>
+            <input type="text" id="fNamaPengirim" placeholder="">
+          </div>
+          <div class="field">
+            <label>Bank Pengirim</label>
+            <input type="text" id="fBankPengirim" placeholder="">
+          </div>
+          <div class="field">
+            <label>Dari Rekening</label>
+            <input type="text" id="fDariRek" placeholder="">
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>Berita / Keterangan</label>
+            <input type="text" id="fBerita" placeholder="(kosong)">
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>No. Referensi</label>
+            <input type="text" id="fNoRef" placeholder="">
+          </div>
+          <div class="field">
+            <label>Biaya Admin (IDR)</label>
+            <div class="input-prefix-wrap" id="wrapAdmin">
+              <span>IDR</span>
+              <input type="text" id="fAdmin" placeholder="0" inputmode="numeric">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kanan: Preview Receipt -->
+    <div>
+      <div class="card" style="padding:1rem;">
+        <h2 class="no-print" style="margin-bottom:14px;">🖨️ Preview Bukti Transfer</h2>
+
+        <div class="receipt-outer">
+          <div class="receipt">
+
+            <!-- Top -->
+            <div class="receipt-top">
+              <div class="receipt-agent-name" id="rNamaAgen">AGEN LAKU PANDAI</div>
+
+              <div class="check-circle">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <polyline points="20,6 9,17 4,12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+
+              <div class="receipt-status" id="rStatus">Transfer Berhasil</div>
+              <div class="receipt-datetime" id="rDatetime">—</div>
+              <div class="receipt-amount" id="rNominal">IDR 0</div>
+            </div>
+
+            <!-- Body rows -->
+            <div class="receipt-body">
+              <div class="receipt-row">
+                <span class="rl">Nama Penerima</span>
+                <span class="rv" id="rNamaPenerima">—</span>
+              </div>
+              <div class="receipt-row" id="rowBankPenerima">
+                <span class="rl">Bank Penerima</span>
+                <span class="rv" id="rBankPenerima">—</span>
+              </div>
+              <div class="receipt-row">
+                <span class="rl">Rekening Tujuan</span>
+                <span class="rv" id="rRekTujuan">—</span>
+              </div>
+              <div class="receipt-row">
+                <span class="rl">Jenis Transaksi</span>
+                <span class="rv" id="rJenis">—</span>
+              </div>
+              <div class="receipt-row" id="rowNamaPengirim">
+                <span class="rl">Nama Pengirim</span>
+                <span class="rv" id="rNamaPengirim">—</span>
+              </div>
+              <div class="receipt-row" id="rowBankPengirim">
+                <span class="rl">Bank Pengirim</span>
+                <span class="rv" id="rBankPengirim">—</span>
+              </div>
+              <div class="receipt-row">
+                <span class="rl">Dari Rekening</span>
+                <span class="rv" id="rDariRek">—</span>
+              </div>
+              <div class="receipt-row" id="rowBerita">
+                <span class="rl">Berita</span>
+                <span class="rv" id="rBerita">—</span>
+              </div>
+              <div class="receipt-row">
+                <span class="rl">No. Referensi</span>
+                <span class="rv" id="rNoRef" style="font-size:11px;word-break:break-all;">—</span>
+              </div>
+            </div>
+
+            <!-- Admin & Total box -->
+            <div class="receipt-admin-box">
+              <div class="receipt-admin-row">
+                <span class="al">Nominal</span>
+                <span class="av" id="rNominalBox">IDR 0</span>
+              </div>
+              <div class="receipt-admin-row">
+                <span class="al">Biaya Admin</span>
+                <span class="av" id="rAdminBox">IDR 0</span>
+              </div>
+              <div class="receipt-admin-row total-row">
+                <span class="al">Total Dibayar</span>
+                <span class="av" id="rTotalBox">IDR 0</span>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="receipt-footer">
+              Terima kasih telah menggunakan layanan kami<br>
+              Simpan bukti ini sebagai tanda transaksi sah
+            </div>
+
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-print no-print" onclick="window.print()">🖨️ Cetak Bukti Transfer</button>
+          <button class="btn-save no-print" id="btnSave">💾 Simpan sebagai Gambar</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /preview-layout -->
+
+  <div class="footer-note no-print">Bukti Transfer Laku Pandai · Berjalan lokal di browser · Tanpa API Key</div>
+</div>
+
+<!-- Tesseract.js -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<!-- html2canvas untuk simpan gambar -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+// ── DOM ──
+const uploadZone    = document.getElementById('uploadZone');
+const fileInput     = document.getElementById('fileInput');
+const previewImg    = document.getElementById('previewImg');
+const changePhoto   = document.getElementById('changePhoto');
+const scanBtn       = document.getElementById('scanBtn');
+const statusBar     = document.getElementById('statusBar');
+const progressWrap  = document.getElementById('progressWrap');
+const progressFill  = document.getElementById('progressFill');
+const progressLabel = document.getElementById('progressLabel');
+const rawToggle     = document.getElementById('rawToggle');
+const rawBox        = document.getElementById('rawBox');
+
+const fNamaAgen     = document.getElementById('fNamaAgen');
+const fStatus       = document.getElementById('fStatus');
+const fDatetime     = document.getElementById('fDatetime');
+const fNominal      = document.getElementById('fNominal');
+const fNamaPenerima = document.getElementById('fNamaPenerima');
+const fRekTujuan    = document.getElementById('fRekTujuan');
+const fJenis        = document.getElementById('fJenis');
+const fDariRek      = document.getElementById('fDariRek');
+const fBankPengirim = document.getElementById('fBankPengirim');
+const fBankPenerima = document.getElementById('fBankPenerima');
+const fNamaPengirim = document.getElementById('fNamaPengirim');
+const fNoRef        = document.getElementById('fNoRef');
+const fAdmin        = document.getElementById('fAdmin');
+const fBerita       = document.getElementById('fBerita');
+const wrapNominal   = document.getElementById('wrapNominal');
+const wrapAdmin     = document.getElementById('wrapAdmin');
+
+const rNamaAgen     = document.getElementById('rNamaAgen');
+const rStatus       = document.getElementById('rStatus');
+const rDatetime     = document.getElementById('rDatetime');
+const rNominal      = document.getElementById('rNominal');
+const rNamaPenerima = document.getElementById('rNamaPenerima');
+const rRekTujuan    = document.getElementById('rRekTujuan');
+const rJenis        = document.getElementById('rJenis');
+const rDariRek      = document.getElementById('rDariRek');
+const rBankPengirim = document.getElementById('rBankPengirim');
+const rBankPenerima = document.getElementById('rBankPenerima');
+const rNamaPengirim = document.getElementById('rNamaPengirim');
+const rBerita       = document.getElementById('rBerita');
+const rNoRef        = document.getElementById('rNoRef');
+const rNominalBox   = document.getElementById('rNominalBox');
+const rAdminBox     = document.getElementById('rAdminBox');
+const rTotalBox     = document.getElementById('rTotalBox');
+
+let imgFile = null;
+
+function idrFmt(n) {
+  const num = parseInt(String(n).replace(/\D/g,''),10) || 0;
+  return 'IDR ' + num.toLocaleString('id-ID');
+}
+function parseNum(s) { return parseInt(s.replace(/\D/g,''),10) || 0; }
+function fmtInput(inp) {
+  const r = inp.value.replace(/\D/g,'');
+  inp.value = r ? parseInt(r,10).toLocaleString('id-ID') : '';
+}
+function setStatus(t,m) {
+  statusBar.className = 'status-bar' + (t?' '+t:'');
+  statusBar.innerHTML = m;
+}
+function markFilled(el,wrap) {
+  el.classList.add('auto-filled');
+  if(wrap) wrap.classList.add('auto-filled');
+}
+
+function updateReceipt() {
+  rNamaAgen.textContent     = fNamaAgen.value.trim()     || 'AGEN LAKU PANDAI';
+  rStatus.textContent       = fStatus.value.trim()       || 'Transfer Berhasil';
+  rDatetime.textContent     = fDatetime.value.trim()     || '—';
+  rNamaPenerima.textContent = fNamaPenerima.value.trim() || '—';
+  rRekTujuan.textContent    = fRekTujuan.value.trim()    || '—';
+  rJenis.textContent        = fJenis.value.trim()        || '—';
+  rDariRek.textContent      = fDariRek.value.trim()      || '—';
+  rBerita.textContent       = fBerita.value.trim()       || '—';
+  rNoRef.textContent        = fNoRef.value.trim()        || '—';
+
+  // Sembunyikan baris opsional jika kosong
+  const np  = fNamaPengirim.value.trim();
+  const bp  = fBankPengirim.value.trim();
+  const bpr = fBankPenerima.value.trim();
+  rNamaPengirim.textContent = np  || '—';
+  rBankPengirim.textContent = bp  || '—';
+  rBankPenerima.textContent = bpr || '—';
+  document.getElementById('rowNamaPengirim').style.display = np  ? '' : 'none';
+  document.getElementById('rowBankPengirim').style.display = bp  ? '' : 'none';
+  document.getElementById('rowBankPenerima').style.display = bpr ? '' : 'none';
+
+  const nom = parseNum(fNominal.value);
+  const adm = parseNum(fAdmin.value);
+  rNominal.textContent    = idrFmt(String(nom));
+  rNominalBox.textContent = idrFmt(String(nom));
+  rAdminBox.textContent   = idrFmt(String(adm));
+  rTotalBox.textContent   = idrFmt(String(nom + adm));
+}
+
+[fNamaAgen,fStatus,fDatetime,fNamaPenerima,fRekTujuan,fJenis,fNamaPengirim,fBankPengirim,fBankPenerima,fDariRek,fNoRef,fBerita]
+  .forEach(el => el.addEventListener('input', updateReceipt));
+[fNominal,fAdmin].forEach(el => el.addEventListener('input',()=>{ fmtInput(el); updateReceipt(); }));
+
+// Upload
+uploadZone.addEventListener('click', ()=>fileInput.click());
+uploadZone.addEventListener('dragover', e=>{ e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', ()=>uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e=>{
+  e.preventDefault(); uploadZone.classList.remove('drag-over');
+  const f=e.dataTransfer.files[0];
+  if(f&&f.type.startsWith('image/')) loadFile(f);
+});
+fileInput.addEventListener('change',()=>{ if(fileInput.files[0]) loadFile(fileInput.files[0]); });
+
+function loadFile(f) {
+  imgFile = f;
+  const url = URL.createObjectURL(f);
+  previewImg.src = url; previewImg.classList.add('show');
+  uploadZone.style.display = 'none'; changePhoto.style.display = 'inline';
+  scanBtn.disabled = false; setStatus('','');
+  rawToggle.style.display='none'; rawBox.style.display='none';
+}
+function resetUpload() {
+  imgFile=null; previewImg.src=''; previewImg.classList.remove('show');
+  uploadZone.style.display=''; changePhoto.style.display='none';
+  fileInput.value=''; scanBtn.disabled=true;
+  progressWrap.classList.remove('show'); setStatus('','');
+  rawToggle.style.display='none'; rawBox.style.display='none';
+}
+function toggleRaw() {
+  rawBox.style.display = rawBox.style.display==='block'?'none':'block';
+  rawToggle.textContent = rawBox.style.display==='block'?'🔼 Sembunyikan':'🔍 Lihat teks mentah OCR';
+}
+
+// ── Deteksi bank dari teks OCR ──
+function detectBank(text) {
+  const t = text.toUpperCase();
+  if (t.includes('BI-FAST') || t.includes('BIFAST')) return 'BRI'; // BI-FAST tetap dari BRI
+  if (t.includes('BCA') || t.includes('BANK CENTRAL ASIA')) return 'BCA';
+  if (t.includes('BRI') || t.includes('BANK RAKYAT')) return 'BRI';
+  if (t.includes('BNI') || t.includes('BANK NEGARA')) return 'BNI';
+  if (t.includes('MANDIRI')) return 'MANDIRI';
+  return 'UNKNOWN';
+}
+
+// ── Normalisasi nominal: hapus trailing ".00" gaya BCA ──
+function parseNominalStr(s) {
+  // "1.000.000,00" atau "1,000,000.00" atau "250.000,00" atau "250,000.00"
+  s = s.trim();
+  // Jika ada koma sebagai desimal (format ID): 1.000.000,00
+  if (/,\d{2}$/.test(s)) s = s.replace(/,\d{2}$/, '');
+  // Jika ada titik sebagai desimal (format EN): 1,000,000.00
+  if (/\.\d{2}$/.test(s)) {
+    // cek apakah titik adalah desimal atau pemisah ribuan
+    const parts = s.split('.');
+    if (parts[parts.length-1].length === 2) s = parts.slice(0,-1).join('.');
+  }
+  return parseInt(s.replace(/[.,\s]/g,''), 10) || 0;
+}
+
+// ── Helper: ambil nilai setelah label pada baris berikutnya atau baris yang sama ──
+function extractAfterLabel(lines, labelPatterns, valuePattern, maxLookahead=3) {
+  for (let i = 0; i < lines.length; i++) {
+    for (const pat of labelPatterns) {
+      const m = lines[i].match(pat);
+      if (m) {
+        // Cek sisa baris setelah label
+        const afterLabel = lines[i].slice(m.index + m[0].length).trim();
+        if (afterLabel && (!valuePattern || valuePattern.test(afterLabel))) {
+          return afterLabel.match(valuePattern || /(.+)/)?.[1]?.trim() || afterLabel;
+        }
+        // Cek baris berikutnya
+        for (let j = 1; j <= maxLookahead && i+j < lines.length; j++) {
+          const nextLine = lines[i+j].trim();
+          if (!nextLine) continue;
+          if (!valuePattern || valuePattern.test(nextLine)) {
+            return nextLine.match(valuePattern || /(.+)/)?.[1]?.trim() || nextLine;
+          }
+          // Jika baris berikut adalah label lain, berhenti
+          if (/^(Nama|Rekening|Jenis|Dari|No\.|Berita|Catatan|Total|Nominal|Biaya|Sumber|Tujuan)/i.test(nextLine)) break;
+        }
+      }
+    }
+  }
+  return '';
+}
+
+// Parse OCR — versi improved: BCA + BRI
+function parseOCR(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const full  = lines.join(' ');
+  const bank  = detectBank(full);
+  const r = { datetime:'', nominal:0, admin:0, namaPenerima:'', rekTujuan:'', jenis:'', namaPengirim:'', dariRek:'', bankPengirim:'', bankPenerima:'', noRef:'', berita:'' };
+
+  // ── 1. DATETIME ──
+  // Format BCA: "23 Jun 2026 12:53:02"
+  // Format BRI: "30 April 2026, 07:49:29 WIB"
+  // Format umum: "30 Apr 2026" / "30 April 2026"
+  const bulanPendek = 'Jan|Feb|Mar|Apr|Mei|Jun|Jul|Agu|Sep|Okt|Nov|Des';
+  const bulanPanjang = 'Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember';
+  const bulanAll = bulanPanjang + '|' + bulanPendek;
+  const dtmRx = new RegExp(
+    `(\\d{1,2}\\s+(?:${bulanAll})\\s+\\d{4}(?:[,\\s]+\\d{1,2}:\\d{2}(?::\\d{2})?(?:\\s*WIB|WIT|WITA)?)?)`,
+    'i'
+  );
+  const dtm = full.match(dtmRx) || full.match(/\d{4}-\d{2}-\d{2}\s+\d{1,2}:\d{2}/);
+  if (dtm) r.datetime = dtm[1] || dtm[0];
+
+  // ── 2. NOMINAL & BIAYA ADMIN ──
+  // BRI BI-FAST: "Total Transaksi Rp202.500" (nominal+admin sudah digabung di header)
+  //              tapi di detail: "Nominal Rp200.000" dan "Biaya Admin Rp2.500"
+  //              → kita ambil Nominal (bukan Total) supaya Biaya Admin bisa diisi terpisah
+  // BCA: nominal tunggal IDR 250.000
+  // Strategi: cari "Nominal Rp/IDR X" dulu, fallback ke angka terbesar
+
+  let nominalVal = 0;
+  let adminVal = 0;
+
+  // Cari baris "Nominal RpX" / "Nominal IDR X"
+  for (let i = 0; i < lines.length; i++) {
+    if (/^Nominal$/i.test(lines[i])) {
+      // Baris berikut atau sisa baris
+      const nxt = lines[i+1]?.trim() || '';
+      const mnom = nxt.match(/(?:Rp|IDR)\.?\s*([\d.,]+)/i) || lines[i].match(/(?:Rp|IDR)\.?\s*([\d.,]+)/i);
+      if (mnom) { nominalVal = parseNominalStr(mnom[1]); }
+    }
+    if (/^Biaya\s*Admin$/i.test(lines[i])) {
+      const nxt = lines[i+1]?.trim() || '';
+      const madm = nxt.match(/(?:Rp|IDR)\.?\s*([\d.,]+)/i) || lines[i].match(/(?:Rp|IDR)\.?\s*([\d.,]+)/i);
+      if (madm) { adminVal = parseNominalStr(madm[1]); }
+    }
+    // Pola inline: "Nominal Rp200.000" dalam satu baris
+    const inlineNom = lines[i].match(/^Nominal\s+(?:Rp|IDR)\.?\s*([\d.,]+)/i);
+    if (inlineNom) nominalVal = parseNominalStr(inlineNom[1]);
+    const inlineAdm = lines[i].match(/^Biaya\s*Admin\s+(?:Rp|IDR)\.?\s*([\d.,]+)/i);
+    if (inlineAdm) adminVal = parseNominalStr(inlineAdm[1]);
+  }
+
+  if (!nominalVal) {
+    // Fallback: cari semua IDR/Rp, ambil terbesar
+    const nomCandidates = [];
+    const nomRx = /(?:IDR|Rp\.?)\s*([\d.,]+)/gi;
+    let nm;
+    while ((nm = nomRx.exec(full)) !== null) {
+      const val = parseNominalStr(nm[1]);
+      if (val >= 1000) nomCandidates.push(val);
+    }
+    if (nomCandidates.length) nominalVal = Math.max(...nomCandidates);
+    else {
+      const nums = [...full.matchAll(/\b(\d{1,3}(?:[.,]\d{3})+)\b/g)]
+        .map(m => parseNominalStr(m[1])).filter(n => n >= 10000 && n <= 999999999);
+      if (nums.length) nominalVal = Math.max(...nums);
+    }
+  }
+
+  r.nominal = nominalVal;
+  r.admin   = adminVal;
+
+  // ── 3. NAMA PENERIMA ──
+  // BCA: "Nama Penerima   SUMARNINGSIH"
+  // BRI: label "Tujuan" kemudian baris berisi nama (semua kapital), lalu bank, lalu no rek
+  let namaPenerima = extractAfterLabel(lines,
+    [/Nama\s*Penerima/i, /Beneficiary\s*Name/i],
+    /([A-Z][A-Z\s]{2,40})/
+  );
+
+  if (!namaPenerima && bank === 'BRI') {
+    // BRI: cari pola "Tujuan" → baris berikut nama kapital
+    for (let i = 0; i < lines.length; i++) {
+      if (/^Tujuan$/i.test(lines[i])) {
+        for (let j = i+1; j < Math.min(i+4, lines.length); j++) {
+          if (/^[A-Z][A-Z\s]{2,}$/.test(lines[j])) {
+            namaPenerima = lines[j].trim();
+            break;
+          }
+        }
+        if (namaPenerima) break;
+      }
+    }
+  }
+
+  // Fallback: cari nama kapital setelah keyword penerima
+  if (!namaPenerima) {
+    const npM = full.match(/(?:Penerima|Tujuan|Kepada)\s*[:\-]?\s*([A-Z]{2}[A-Z\s]{1,35})(?=\s+(?:BANK|BCA|BRI|BNI|\d))/i);
+    if (npM) namaPenerima = npM[1].trim();
+  }
+  if (namaPenerima) r.namaPenerima = namaPenerima.replace(/\s+/g,' ').trim();
+
+  // ── 4. REKENING TUJUAN ──
+  // BCA: "357 - 129 - 1442" (setelah label "Rekening Tujuan")
+  // BRI→BRI: blok "Tujuan" > Nama > BANK BRI > nomor
+  // BRI→BNI (BI-FAST): blok "Tujuan" > Nama > BANK BNI > nomor (misal "1282 9626 16")
+  let rekTujuan = extractAfterLabel(lines,
+    [/Rekening\s*Tujuan/i, /No\.?\s*Rek(?:ening)?\s*Tujuan/i, /Destination\s*Account/i],
+    /([\d][\d\s\-]{5,25}[\d])/
+  );
+
+  if (!rekTujuan) {
+    // Nomor rekening: minimal 8 digit, boleh ada spasi/dash di tengah
+    const isRekNo = s => /^[\d][\d\s\-]{5,22}[\d]$/.test(s) && s.replace(/\D/g,'').length >= 8;
+    // Cari blok "Tujuan"
+    for (let i = 0; i < lines.length; i++) {
+      if (/^Tujuan$/i.test(lines[i])) {
+        for (let j = i+1; j < Math.min(i+7, lines.length); j++) {
+          const ln = lines[j].trim();
+          if (isRekNo(ln)) { rekTujuan = ln; break; }
+          if (/^(Sumber|Jenis|Nominal|Biaya|Total|No\.?\s*Ref|Catatan|Alias)/i.test(ln)) break;
+        }
+        if (rekTujuan) break;
+      }
+    }
+    // Fallback: setelah BANK BNI atau BANK BRI (blok tujuan = kemunculan terakhir)
+    if (!rekTujuan) {
+      const bankTujuanRx = /BANK\s*(BRI|BNI|BCA|MANDIRI)/gi;
+      let lastMatch = null, mb;
+      while ((mb = bankTujuanRx.exec(full)) !== null) lastMatch = mb;
+      if (lastMatch) {
+        const after = full.slice(lastMatch.index + lastMatch[0].length);
+        const mrek = after.match(/\b(\d[\d\s\-]{5,20}\d)\b/);
+        if (mrek && mrek[1].replace(/\D/g,'').length >= 8) rekTujuan = mrek[1].trim();
+      }
+    }
+  }
+  if (rekTujuan) r.rekTujuan = rekTujuan.trim().replace(/\s+/g,' ');
+
+  // ── 5. JENIS TRANSAKSI ──
+  // BCA: "Transfer ke Rekening BCA"
+  // BRI normal: "Transfer Bank BRI"
+  // BRI BI-FAST: "Transfer BI-FAST" — jangan terpotong di "Transfer BI"
+  let jenis = '';
+  for (let i = 0; i < lines.length; i++) {
+    if (/Jenis\s*Transaksi/i.test(lines[i])) {
+      // Ambil sisa baris setelah label
+      const after = lines[i].replace(/Jenis\s*Transaksi/i,'').replace(/^[\s:\-]+/,'').trim();
+      if (after) { jenis = after; break; }
+      // Atau baris berikut
+      if (i+1 < lines.length) { jenis = lines[i+1].trim(); break; }
+    }
+  }
+  // Fallback regex — tangkap sampai akhir kata termasuk "BI-FAST"
+  if (!jenis) {
+    const jtM = full.match(/Jenis\s*Transaksi\s*[:\-]?\s*(Transfer[\w\s\-FAST]{3,40})/i);
+    if (jtM) jenis = jtM[1].trim();
+  }
+  if (jenis) r.jenis = jenis.replace(/\s+/g,' ').trim();
+
+  // ── 6. DARI REKENING ──
+  // BCA: "159 - 0** - **06" (setelah label "Dari Rekening")
+  // BRI normal: "5870 **** **** 533"
+  // BRI BI-FAST Sumber Dana: "3685 **** **** 532" → OCR bisa: "3685 *rer vers 530"
+  //   (diawali digit atau *, diikuti kata-kata/bintang campuran)
+  let dariRek = extractAfterLabel(lines,
+    [/Dari\s*Rekening/i, /From\s*Account/i, /Source\s*Account/i],
+    /([\d\*][\d\s\-\*]{6,30})/
+  );
+
+  if (!dariRek) {
+    // Pola masked rekening: diawali digit/bintang, ada bagian tersensor
+    const isMaskedRek = s => {
+      // "5870 **** **** 533" atau "3685 **** **** 532" — bersih
+      if (/^[\d\*]{4}\s+[\*\d]{4}\s+[\*\d]{4}\s+\d{3,4}$/.test(s)) return true;
+      // OCR misread ringan: "5870 vex axex 533"
+      if (/^[\d\*]{3,5}\s+[\*a-z]{2,8}\s+[\*a-z]{2,8}\s+\d{3,4}$/i.test(s)) return true;
+      // OCR misread berat: "3685 111 +e 53D" — 4 digit awal, 3-4 token di tengah, 3+ char di akhir
+      // Cukup: diawali 4 digit, diakhiri 2-4 digit/huruf, total ≥ 4 token
+      if (/^(\d{4})\s+\S+\s+\S+\s+([A-Z0-9]{2,5})$/i.test(s)) return true;
+      return false;
+    };
+    const rekonstRek = s => {
+      // Ekstrak token pertama (4 digit awal) dan token terakhir
+      const tokens = s.trim().split(/\s+/);
+      if (tokens.length >= 3) {
+        const first = tokens[0];
+        // Token terakhir: ambil hanya digit-nya
+        const lastDigits = tokens[tokens.length - 1].replace(/\D/g, '');
+        if (/^\d{3,5}$/.test(first) && lastDigits.length >= 2) {
+          return `${first} **** **** ${lastDigits}`;
+        }
+      }
+      return s;
+    };
+
+    let sumberIdx = -1;
+    for (let i = 0; i < lines.length; i++) {
+      if (/Sumber\s*Dana/i.test(lines[i])) { sumberIdx = i; break; }
+    }
+
+    if (sumberIdx > -1) {
+      for (let j = sumberIdx+1; j < Math.min(sumberIdx+8, lines.length); j++) {
+        const ln = lines[j].trim();
+        if (isMaskedRek(ln)) { dariRek = rekonstRek(ln); break; }
+        // Rekening tidak termasked: 10+ digit dengan spasi
+        if (/^[\d\s]{10,25}$/.test(ln) && ln.replace(/\D/g,'').length >= 8) {
+          const norm = ln.replace(/\D/g,'');
+          const rekTujuanNorm = (r.rekTujuan||'').replace(/\D/g,'');
+          if (norm !== rekTujuanNorm) { dariRek = ln; break; }
+        }
+        // Toleran OCR noise: diawali 4 digit, akhiri 3 digit, ada noise di tengah
+        const noiseM = ln.match(/^(\d{4})\s+[\*\w]{2,8}\s+[\*\w]{2,8}\s+(\d{3,4})$/i);
+        if (noiseM) { dariRek = `${noiseM[1]} **** **** ${noiseM[2]}`; break; }
+        if (/^(Jenis|Nominal|Biaya|Total|No\.?\s*Ref|Tujuan|Catatan|Alias)/i.test(ln)) break;
+      }
+    }
+
+    // Fallback: scan semua baris
+    if (!dariRek) {
+      for (const ln of lines) {
+        if (isMaskedRek(ln.trim())) { dariRek = rekonstRek(ln.trim()); break; }
+      }
+    }
+    // Fallback 2: nomor panjang unik bukan rekTujuan
+    if (!dariRek) {
+      // Normalisasi rekTujuan untuk perbandingan (hapus spasi dan tanda baca)
+      const rekTujuanNorm = (r.rekTujuan || '').replace(/[\s\-\.]/g,'');
+      const allRekNos = [...full.matchAll(/\b(\d[\d\s]{12,20}\d)\b/g)]
+        .map(m => m[1].trim().replace(/\s+/g,' '))
+        .filter(s => {
+          const sNorm = s.replace(/[\s\-\.]/g,'');
+          return sNorm.length >= 10 && sNorm !== rekTujuanNorm;
+        });
+      if (allRekNos.length) dariRek = [...new Set(allRekNos)][0];
+    }
+  }
+  if (dariRek) r.dariRek = dariRek.trim().replace(/\s+/g,' ');
+
+  // ── 6b. BANK PENGIRIM & BANK PENERIMA ──
+  // BCA: label "Dari Rekening" / "Jenis Transaksi" mengandung nama bank tujuan
+  // BRI: blok "Sumber Dana" → Nama → BANK XXX (pengirim)
+  //       blok "Tujuan"     → Nama → BANK XXX (penerima)
+  const daftarBank = [
+    { nama: 'BANK BRI', rx: /\bBANK\s*RAKYAT\s*INDONESIA\b|\bBANK\s*BRI\b/i },
+    { nama: 'BANK BCA', rx: /\bBANK\s*CENTRAL\s*ASIA\b|\bBANK\s*BCA\b|\bBCA\b/i },
+    { nama: 'BANK BNI', rx: /\bBANK\s*NEGARA\s*INDONESIA\b|\bBANK\s*BNI\b|\bBNI\b/i },
+    { nama: 'BANK MANDIRI', rx: /\bBANK\s*MANDIRI\b|\bMANDIRI\b/i },
+    { nama: 'BANK BSI', rx: /\bBANK\s*SYARIAH\s*INDONESIA\b|\bBSI\b/i },
+    { nama: 'BANK DANAMON', rx: /\bDANAMON\b/i },
+    { nama: 'BANK CIMB NIAGA', rx: /\bCIMB\b|\bNIAGA\b/i },
+    { nama: 'BANK PERMATA', rx: /\bPERMATA\b/i },
+    { nama: 'BANK BTN', rx: /\bBANK\s*BTN\b|\bBTN\b/i },
+    { nama: 'BANK MEGA', rx: /\bBANK\s*MEGA\b/i },
+  ];
+
+  const namaBank = s => {
+    for (const b of daftarBank) if (b.rx.test(s)) return b.nama;
+    return '';
+  };
+
+  // Cari bank pengirim & nama pengirim dari blok "Sumber Dana"
+  let bankPengirim = '';
+  let namaPengirim = '';
+  for (let i = 0; i < lines.length; i++) {
+    if (/Sumber\s*Dana/i.test(lines[i])) {
+      for (let j = i+1; j < Math.min(i+6, lines.length); j++) {
+        const ln = lines[j].trim();
+        // Nama pengirim: baris kapital sebelum BANK XXX
+        if (!namaPengirim && /^[A-Z][A-Z\s]{2,}$/.test(ln) && !/^BANK\s/i.test(ln)) {
+          namaPengirim = ln;
+        }
+        const nb = namaBank(ln);
+        if (nb) { bankPengirim = nb; break; }
+        if (/^(Tujuan|Jenis|Nominal|No\.?\s*Ref)/i.test(ln)) break;
+      }
+      break;
+    }
+  }
+  // Fallback BCA: bank pengirim = bank asal struk (dari "Dari Rekening" konteks)
+  if (!bankPengirim) {
+    // Cari baris mengandung nama bank di bagian atas (header struk BCA dll)
+    for (let i = 0; i < Math.min(5, lines.length); i++) {
+      const nb = namaBank(lines[i]);
+      if (nb) { bankPengirim = nb; break; }
+    }
+  }
+
+  // Cari bank penerima dari blok "Tujuan"
+  let bankPenerima = '';
+  for (let i = 0; i < lines.length; i++) {
+    if (/^Tujuan$/i.test(lines[i])) {
+      for (let j = i+1; j < Math.min(i+6, lines.length); j++) {
+        const nb = namaBank(lines[j]);
+        if (nb) { bankPenerima = nb; break; }
+        if (/^(Sumber|Jenis|Nominal|No\.?\s*Ref)/i.test(lines[j])) break;
+      }
+      break;
+    }
+  }
+  // Fallback: cari dari jenis transaksi "Transfer ke Rekening BCA"
+  if (!bankPenerima && r.jenis) {
+    bankPenerima = namaBank(r.jenis);
+  }
+  // Fallback 2: cari dari "Rekening Tujuan" label area
+  if (!bankPenerima) {
+    for (let i = 0; i < lines.length; i++) {
+      if (/Rekening\s*Tujuan/i.test(lines[i])) {
+        for (let j = i-3; j <= i+3; j++) {
+          if (j >= 0 && j < lines.length) {
+            const nb = namaBank(lines[j]);
+            if (nb) { bankPenerima = nb; break; }
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  if (namaPengirim) r.namaPengirim = namaPengirim;
+  if (bankPengirim) r.bankPengirim = bankPengirim;
+  if (bankPenerima) r.bankPenerima = bankPenerima;
+
+
+  // BCA: "AC33B762-7923-40 2B-B930-359F7B1E B762" (bisa multiline / spasi)
+  // BRI: "134361287643" (numerik murni)
+  let noRef = '';
+  for (let i = 0; i < lines.length; i++) {
+    if (/No\.?\s*Ref(?:erensi)?|Reference\s*No|Ref\.?\s*No/i.test(lines[i])) {
+      // Sisa baris setelah label
+      const after = lines[i].replace(/No\.?\s*Ref(?:erensi)?|Reference\s*No|Ref\.?\s*No/i,'').replace(/[:\-]/,'').trim();
+      if (after && /[A-Z0-9]{4}/i.test(after)) { noRef = after; break; }
+      // Baris berikut
+      if (i+1 < lines.length) {
+        const nxt = lines[i+1].trim();
+        if (/[A-Z0-9\-]{6,}/i.test(nxt)) { noRef = nxt; break; }
+      }
+    }
+  }
+  // Fallback regex lebar untuk BCA ref (alphanumeric + dash, panjang)
+  if (!noRef) {
+    const nrM = full.match(/(?:No\.?\s*Ref(?:erensi)?)[^A-Z0-9]*([A-Z0-9][A-Z0-9\-]{7,60})/i);
+    if (nrM) noRef = nrM[1];
+  }
+  // Fallback untuk BRI (numerik murni >= 8 digit)
+  if (!noRef) {
+    const nrM = full.match(/(?:No\.?\s*Ref)[^\d]*(\d{8,20})/i);
+    if (nrM) noRef = nrM[1];
+  }
+  if (noRef) r.noRef = noRef.trim();
+
+  // ── 8. BERITA / CATATAN ──
+  // BRI: "Catatan   pmbyrn bon tgl\n24626 an kikicel\nmksh" → multi-baris
+  // BCA: "Berita" → satu baris
+  let berita = '';
+  const labelBerita = /^(?:Berita|Keterangan|Catatan|Note)$/i;
+  const stopBerita  = /^(?:Nominal|Biaya|Total|No\.|Dari|Rekening|Alias|Jenis|Sumber|Tujuan|INFORMASI)/i;
+
+  for (let i = 0; i < lines.length; i++) {
+    // Label saja di satu baris (BRI: "Catatan", BCA: "Berita")
+    if (labelBerita.test(lines[i])) {
+      // Cek apakah nilai ada di baris yang sama (inline setelah spasi)
+      const sameLineVal = lines[i].replace(/^(?:Berita|Keterangan|Catatan|Note)\s*/i, '').trim();
+      if (sameLineVal && sameLineVal !== '-' && sameLineVal !== '—') {
+        berita = sameLineVal;
+      } else {
+        // Kumpulkan baris-baris berikutnya sampai ketemu label baru
+        const parts = [];
+        for (let j = i + 1; j < Math.min(i + 6, lines.length); j++) {
+          const nxt = lines[j].trim();
+          if (!nxt || nxt === '-' || nxt === '—') break;
+          if (stopBerita.test(nxt)) break;
+          parts.push(nxt);
+        }
+        if (parts.length) berita = parts.join(' ');
+      }
+      break;
+    }
+    // Pola inline "Catatan   pmbyrn bon tgl" (label + spasi + nilai, satu baris)
+    const inlineM = lines[i].match(/^(?:Berita|Keterangan|Catatan|Note)\s+(.+)/i);
+    if (inlineM) {
+      const val = inlineM[1].trim();
+      if (val && val !== '-' && val !== '—') {
+        // Lanjut cek baris berikutnya sampai stop
+        const parts = [val];
+        for (let j = i + 1; j < Math.min(i + 5, lines.length); j++) {
+          const nxt = lines[j].trim();
+          if (!nxt || nxt === '-' || nxt === '—') break;
+          if (stopBerita.test(nxt)) break;
+          // Hanya lanjutkan jika baris bukan label baru (tidak diawali huruf kapital diikuti titik dua)
+          // Berhenti jika baris pendek 1-2 kata kapital semua (kemungkinan label)
+          if (/^[A-Z][a-zA-Z]+$/.test(nxt) && nxt.split(' ').length <= 2) break;
+          parts.push(nxt);
+        }
+        berita = parts.join(' ');
+        break;
+      }
+    }
+  }
+  if (berita) r.berita = berita;
+
+  return r;
+}
+
+// Scan
+scanBtn.addEventListener('click', async ()=>{
+  if(!imgFile) return;
+  if(typeof Tesseract==='undefined'){
+    setStatus('error','❌ Library OCR belum termuat. Pastikan koneksi internet aktif, refresh lalu coba lagi.');
+    return;
+  }
+  scanBtn.disabled=true;
+  scanBtn.innerHTML='<span class="spinner"></span> Memproses...';
+  progressWrap.classList.add('show');
+  progressFill.style.width='0%';
+  setStatus('loading','⏳ Membaca teks dari gambar...');
+
+  try {
+    const result = await Tesseract.recognize(imgFile, 'ind+eng', {
+      workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
+      corePath:   'https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core-simd-lstm.wasm.js',
+      langPath:   'https://tessdata.projectnaptha.com/4.0.0',
+      logger: m=>{
+        if(m.status==='recognizing text'){
+          const p=Math.round(m.progress*100);
+          progressFill.style.width=p+'%';
+          progressLabel.textContent=`Membaca teks... ${p}%`;
+        } else { progressLabel.textContent=m.status; }
+      }
+    });
+
+    const rawText = result.data.text;
+    // Tampilkan teks OCR + hasil parse untuk debug
+    const debugLines = rawText.split('\n').map((l,i)=>`[${String(i+1).padStart(2,'0')}] ${l}`).join('\n');
+    rawBox.textContent = debugLines;
+    rawToggle.style.display = 'inline';
+
+    const d = parseOCR(rawText);
+    const bank = detectBank(rawText);
+    let filled = 0;
+
+    if(d.datetime)     { fDatetime.value    = d.datetime;                           markFilled(fDatetime);             filled++; }
+    if(d.nominal)      { fNominal.value     = d.nominal.toLocaleString('id-ID');    markFilled(fNominal, wrapNominal); filled++; }
+    if(d.admin)        { fAdmin.value       = d.admin.toLocaleString('id-ID');      markFilled(fAdmin, wrapAdmin);     filled++; }
+    if(d.namaPenerima) { fNamaPenerima.value= d.namaPenerima;                       markFilled(fNamaPenerima);         filled++; }
+    if(d.rekTujuan)    { fRekTujuan.value   = d.rekTujuan;                          markFilled(fRekTujuan);            filled++; }
+    if(d.jenis)        { fJenis.value       = d.jenis;                              markFilled(fJenis);                filled++; }
+    if(d.dariRek)      { fDariRek.value      = d.dariRek;                            markFilled(fDariRek);               filled++; }
+    if(d.namaPengirim) { fNamaPengirim.value  = d.namaPengirim;                       markFilled(fNamaPengirim);          filled++; }
+    if(d.bankPengirim) { fBankPengirim.value  = d.bankPengirim;                       markFilled(fBankPengirim);          filled++; }
+    if(d.bankPenerima) { fBankPenerima.value  = d.bankPenerima;                       markFilled(fBankPenerima);          filled++; }
+    if(d.noRef)        { fNoRef.value       = d.noRef;                              markFilled(fNoRef);                filled++; }
+    if(d.berita)       { fBerita.value      = d.berita;                             markFilled(fBerita);               filled++; }
+
+    updateReceipt();
+    progressWrap.classList.remove('show');
+
+    if(filled===0)
+      setStatus('error','⚠️ Teks terbaca tapi data tidak terdeteksi otomatis. Cek teks mentah dan isi form manual.');
+    else
+      setStatus('success',`✅ Berhasil mengisi ${filled} field otomatis (ditandai biru). Bank terdeteksi: <strong>${bank}</strong>. Periksa dan lengkapi jika perlu.`);
+
+  } catch(err) {
+    setStatus('error','❌ Gagal memproses: '+(err.message||'Terjadi kesalahan.'));
+    progressWrap.classList.remove('show');
+  }
+
+  scanBtn.disabled=false;
+  scanBtn.innerHTML='🔍 Scan &amp; Isi Otomatis';
+});
+
+updateReceipt();
+
+// ── Simpan sebagai Gambar ──
+document.getElementById('btnSave').addEventListener('click', async () => {
+  const btn = document.getElementById('btnSave');
+  if (typeof html2canvas === 'undefined') {
+    alert('Library html2canvas belum termuat. Pastikan ada koneksi internet lalu refresh halaman.');
+    return;
+  }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="border-top-color:#0097a7;border-color:#ddd;"></span> Menyimpan...';
+
+  try {
+    const receiptEl = document.querySelector('.receipt');
+    const canvas = await html2canvas(receiptEl, {
+      scale: 3,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false
+    });
+
+    const link = document.createElement('a');
+    const nama = (document.getElementById('fNamaPenerima').value.trim() || 'nasabah')
+                   .replace(/\s+/g, '-').toLowerCase();
+    const tgl  = (document.getElementById('fDatetime').value.trim() || '')
+                   .replace(/[\s\/:]/g, '-').substring(0, 15) || new Date().toLocaleDateString('id-ID').replace(/\//g,'-');
+    link.download = `bukti-transfer-${nama}-${tgl}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+
+    btn.innerHTML = '✅ Gambar Tersimpan!';
+    setTimeout(() => { btn.innerHTML = '💾 Simpan sebagai Gambar'; btn.disabled = false; }, 2500);
+
+  } catch (err) {
+    alert('Gagal menyimpan gambar: ' + (err.message || 'Error tidak diketahui'));
+    btn.innerHTML = '💾 Simpan sebagai Gambar';
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
