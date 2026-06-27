@@ -72,6 +72,7 @@ body {
 }
 .field input:focus { border-color:#0097a7; }
 .field input.auto-filled { background:#e0f7f8; border-color:#4db6bc; }
+.field select.auto-filled { background:#e0f7f8; border-color:#4db6bc; }
 .input-prefix-wrap { display:flex; border:1px solid #d5dbd8; border-radius:8px; overflow:hidden; transition:border-color .15s; }
 .input-prefix-wrap span { padding:0 10px; background:#f0f4f2; border-right:1px solid #d5dbd8; font-size:13px; color:#888; display:flex; align-items:center; white-space:nowrap; }
 .input-prefix-wrap input { border:none; padding:8px 11px; font-size:13px; flex:1; outline:none; font-family:inherit; background:transparent; }
@@ -207,6 +208,8 @@ body {
 .btn-save { width:100%; background:#fff; color:#0097a7; border:1.5px solid #0097a7; padding:11px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .15s; margin-top:8px; }
 .btn-save:hover { background:#e0f7f8; }
 .btn-save:disabled { border-color:#bbb; color:#bbb; cursor:not-allowed; }
+.btn-reset { width:100%; background:#fff; color:#e53935; border:1.5px solid #e53935; padding:11px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .15s; margin-top:8px; }
+.btn-reset:hover { background:#ffebee; }
 .btn-row { display:flex; flex-direction:column; gap:0; }
 
 .spinner { width:15px; height:15px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
@@ -363,9 +366,236 @@ body {
             <label>Rekening Tujuan</label>
             <input type="text" id="fRekTujuan" placeholder="">
           </div>
-          <div class="field">
+          <div class="field" style="grid-column:1/-1">
             <label>Jenis Transaksi</label>
-            <input type="text" id="fJenis" placeholder="">
+            <select id="fJenis" style="border:1px solid #d5dbd8;border-radius:8px;padding:8px 11px;font-size:13px;outline:none;background:#fff;color:#1a1a1a;font-family:inherit;transition:border-color .15s;width:100%;cursor:pointer;" onfocus="this.style.borderColor='#0097a7'" onblur="this.style.borderColor='#d5dbd8'">
+              <option value="">-- Pilih Jenis Transaksi --</option>
+
+              <optgroup label="🔁 Transfer Sesama Bank">
+                <option value="Transfer Sesama BRI">Transfer Sesama BRI</option>
+                <option value="Transfer Sesama BCA">Transfer Sesama BCA</option>
+                <option value="Transfer Sesama BNI">Transfer Sesama BNI</option>
+                <option value="Transfer Sesama Mandiri">Transfer Sesama Mandiri</option>
+                <option value="Transfer Sesama BSI">Transfer Sesama BSI</option>
+                <option value="Transfer Sesama BTN">Transfer Sesama BTN</option>
+                <option value="Transfer Sesama CIMB Niaga">Transfer Sesama CIMB Niaga</option>
+                <option value="Transfer Sesama Danamon">Transfer Sesama Danamon</option>
+                <option value="Transfer Sesama Permata">Transfer Sesama Permata</option>
+                <option value="Transfer Sesama Mega">Transfer Sesama Mega</option>
+              </optgroup>
+
+              <optgroup label="🏦 Transfer ke Bank Lain (Bank BUKU 4)">
+                <option value="Transfer ke BRI">Transfer ke BRI</option>
+                <option value="Transfer ke BCA">Transfer ke BCA</option>
+                <option value="Transfer ke BNI">Transfer ke BNI</option>
+                <option value="Transfer ke Mandiri">Transfer ke Mandiri</option>
+                <option value="Transfer ke BSI">Transfer ke BSI (Bank Syariah Indonesia)</option>
+                <option value="Transfer ke BTN">Transfer ke BTN</option>
+                <option value="Transfer ke CIMB Niaga">Transfer ke CIMB Niaga</option>
+                <option value="Transfer ke Danamon">Transfer ke Danamon</option>
+                <option value="Transfer ke Permata">Transfer ke Permata</option>
+                <option value="Transfer ke Mega">Transfer ke Mega</option>
+                <option value="Transfer ke Panin">Transfer ke Panin</option>
+                <option value="Transfer ke OCBC">Transfer ke OCBC</option>
+                <option value="Transfer ke Maybank">Transfer ke Maybank</option>
+                <option value="Transfer ke Commonwealth">Transfer ke Commonwealth</option>
+                <option value="Transfer ke Standard Chartered">Transfer ke Standard Chartered</option>
+                <option value="Transfer ke Citibank">Transfer ke Citibank</option>
+                <option value="Transfer ke HSBC">Transfer ke HSBC</option>
+                <option value="Transfer ke DBS">Transfer ke DBS</option>
+                <option value="Transfer ke UOB">Transfer ke UOB</option>
+              </optgroup>
+
+              <optgroup label="🏦 Transfer ke Bank Daerah (BPD)">
+                <option value="Transfer ke BPD Jawa Barat (BJB)">Transfer ke BJB (Bank Jabar Banten)</option>
+                <option value="Transfer ke BPD Jawa Tengah">Transfer ke BPD Jawa Tengah</option>
+                <option value="Transfer ke BPD Jawa Timur (Bank Jatim)">Transfer ke Bank Jatim</option>
+                <option value="Transfer ke BPD DKI">Transfer ke Bank DKI</option>
+                <option value="Transfer ke BPD DIY">Transfer ke BPD DIY</option>
+                <option value="Transfer ke BPD Bali">Transfer ke BPD Bali</option>
+                <option value="Transfer ke BPD Sumatera Utara (Bank Sumut)">Transfer ke Bank Sumut</option>
+                <option value="Transfer ke BPD Sumatera Barat (Bank Nagari)">Transfer ke Bank Nagari</option>
+                <option value="Transfer ke BPD Sumatera Selatan (Bank Sumsel Babel)">Transfer ke Bank Sumsel Babel</option>
+                <option value="Transfer ke BPD Riau Kepri">Transfer ke BPD Riau Kepri</option>
+                <option value="Transfer ke BPD Kalimantan Selatan (Bankal)">Transfer ke Bankal (Kalimantan Selatan)</option>
+                <option value="Transfer ke BPD Kalimantan Timur (Bankaltimtara)">Transfer ke Bankaltimtara</option>
+                <option value="Transfer ke BPD Sulawesi Utara (Bank SulutGo)">Transfer ke Bank SulutGo</option>
+                <option value="Transfer ke BPD Sulawesi Selatan (Bank Sulselbar)">Transfer ke Bank Sulselbar</option>
+                <option value="Transfer ke BPD NTT">Transfer ke BPD NTT</option>
+                <option value="Transfer ke BPD NTB">Transfer ke BPD NTB</option>
+                <option value="Transfer ke BPD Papua">Transfer ke BPD Papua</option>
+                <option value="Transfer ke BPD Aceh (Bank Aceh Syariah)">Transfer ke Bank Aceh Syariah</option>
+                <option value="Transfer ke BPD Lampung">Transfer ke BPD Lampung</option>
+                <option value="Transfer ke BPD Bengkulu">Transfer ke BPD Bengkulu</option>
+                <option value="Transfer ke BPD Jambi">Transfer ke BPD Jambi</option>
+                <option value="Transfer ke BPD Kalimantan Barat">Transfer ke BPD Kalimantan Barat</option>
+                <option value="Transfer ke BPD Kalimantan Tengah">Transfer ke BPD Kalimantan Tengah</option>
+                <option value="Transfer ke BPD Maluku dan Maluku Utara">Transfer ke BPD Maluku &amp; Maluku Utara</option>
+                <option value="Transfer ke BPD Sulawesi Tengah">Transfer ke BPD Sulawesi Tengah</option>
+                <option value="Transfer ke BPD Sulawesi Tenggara">Transfer ke BPD Sulawesi Tenggara</option>
+              </optgroup>
+
+              <optgroup label="🏦 Transfer ke Bank Digital / Neo Bank">
+                <option value="Transfer ke Jenius (BTPN)">Transfer ke Jenius (BTPN)</option>
+                <option value="Transfer ke Blu (BCA Digital)">Transfer ke Blu (BCA Digital)</option>
+                <option value="Transfer ke Jago (Bank Jago)">Transfer ke Jago (Bank Jago)</option>
+                <option value="Transfer ke Digibank (DBS)">Transfer ke Digibank (DBS)</option>
+                <option value="Transfer ke Motion Banking (MNC Bank)">Transfer ke Motion Banking (MNC Bank)</option>
+                <option value="Transfer ke Wokee (Bukopin)">Transfer ke Wokee (Bukopin)</option>
+                <option value="Transfer ke Allo Bank">Transfer ke Allo Bank</option>
+                <option value="Transfer ke Bank Raya (BRI Agro)">Transfer ke Bank Raya</option>
+                <option value="Transfer ke Seabank">Transfer ke Seabank</option>
+                <option value="Transfer ke Neo Commerce (BNC)">Transfer ke Bank Neo Commerce (BNC)</option>
+                <option value="Transfer ke Superbank">Transfer ke Superbank</option>
+                <option value="Transfer ke Bank Saqu (Jago)">Transfer ke Bank Saqu</option>
+              </optgroup>
+
+              <optgroup label="⚡ BI-FAST">
+                <option value="Transfer BI-FAST ke BRI">BI-FAST ke BRI</option>
+                <option value="Transfer BI-FAST ke BCA">BI-FAST ke BCA</option>
+                <option value="Transfer BI-FAST ke BNI">BI-FAST ke BNI</option>
+                <option value="Transfer BI-FAST ke Mandiri">BI-FAST ke Mandiri</option>
+                <option value="Transfer BI-FAST ke BSI">BI-FAST ke BSI</option>
+                <option value="Transfer BI-FAST ke BTN">BI-FAST ke BTN</option>
+                <option value="Transfer BI-FAST ke CIMB Niaga">BI-FAST ke CIMB Niaga</option>
+                <option value="Transfer BI-FAST ke Danamon">BI-FAST ke Danamon</option>
+                <option value="Transfer BI-FAST ke Permata">BI-FAST ke Permata</option>
+                <option value="Transfer BI-FAST ke Mega">BI-FAST ke Mega</option>
+                <option value="Transfer BI-FAST ke Jago">BI-FAST ke Jago</option>
+                <option value="Transfer BI-FAST ke Jenius">BI-FAST ke Jenius</option>
+                <option value="Transfer BI-FAST ke Seabank">BI-FAST ke Seabank</option>
+                <option value="Transfer BI-FAST">BI-FAST (Bank lain)</option>
+              </optgroup>
+
+              <optgroup label="💡 Bayar Listrik">
+                <option value="Bayar Listrik PLN Prabayar (Token)">Bayar Token Listrik PLN</option>
+                <option value="Bayar Listrik PLN Pascabayar">Bayar Tagihan Listrik PLN Pascabayar</option>
+                <option value="Bayar Listrik PLN Non-Taglis">Bayar Listrik PLN Non-Taglis</option>
+              </optgroup>
+
+              <optgroup label="💧 Bayar Air (PDAM)">
+                <option value="Bayar PDAM">Bayar Tagihan PDAM</option>
+                <option value="Bayar PDAM Tirta Moedal">Bayar PDAM Tirta Moedal</option>
+                <option value="Bayar PDAM Tirta Lawu">Bayar PDAM Tirta Lawu</option>
+                <option value="Bayar PDAM Tirta Pakuan">Bayar PDAM Tirta Pakuan</option>
+                <option value="Bayar PDAM Tirta Kencana">Bayar PDAM Tirta Kencana</option>
+              </optgroup>
+
+              <optgroup label="🏥 BPJS">
+                <option value="Bayar BPJS Kesehatan">Bayar BPJS Kesehatan</option>
+                <option value="Bayar BPJS Ketenagakerjaan">Bayar BPJS Ketenagakerjaan</option>
+              </optgroup>
+
+              <optgroup label="📱 Pulsa &amp; Paket Data">
+                <option value="Isi Pulsa Telkomsel">Isi Pulsa Telkomsel</option>
+                <option value="Isi Pulsa Indosat (IM3)">Isi Pulsa Indosat (IM3 Ooredoo)</option>
+                <option value="Isi Pulsa XL Axiata">Isi Pulsa XL Axiata</option>
+                <option value="Isi Pulsa Axis">Isi Pulsa Axis</option>
+                <option value="Isi Pulsa Tri (3)">Isi Pulsa Tri (3)</option>
+                <option value="Isi Pulsa Smartfren">Isi Pulsa Smartfren</option>
+                <option value="Isi Paket Data Telkomsel">Isi Paket Data Telkomsel</option>
+                <option value="Isi Paket Data Indosat">Isi Paket Data Indosat</option>
+                <option value="Isi Paket Data XL">Isi Paket Data XL</option>
+                <option value="Isi Paket Data Axis">Isi Paket Data Axis</option>
+                <option value="Isi Paket Data Tri">Isi Paket Data Tri (3)</option>
+                <option value="Isi Paket Data Smartfren">Isi Paket Data Smartfren</option>
+              </optgroup>
+
+              <optgroup label="💰 E-Wallet (Top Up)">
+                <option value="Isi Ulang GoPay">Isi Ulang GoPay</option>
+                <option value="Isi Ulang OVO">Isi Ulang OVO</option>
+                <option value="Isi Ulang DANA">Isi Ulang DANA</option>
+                <option value="Isi Ulang ShopeePay">Isi Ulang ShopeePay</option>
+                <option value="Isi Ulang LinkAja">Isi Ulang LinkAja</option>
+                <option value="Isi Ulang Sakuku (BCA)">Isi Ulang Sakuku (BCA)</option>
+                <option value="Isi Ulang i.Saku (Indomaret)">Isi Ulang i.Saku (Indomaret)</option>
+                <option value="Isi Ulang DOKU">Isi Ulang DOKU</option>
+                <option value="Isi Ulang Paytren">Isi Ulang Paytren</option>
+                <option value="Isi Ulang Flip">Transfer via Flip</option>
+              </optgroup>
+
+              <optgroup label="🎮 Game &amp; Hiburan">
+                <option value="Top Up Mobile Legends">Top Up Mobile Legends</option>
+                <option value="Top Up Free Fire">Top Up Free Fire</option>
+                <option value="Top Up PUBG Mobile">Top Up PUBG Mobile</option>
+                <option value="Top Up Valorant">Top Up Valorant</option>
+                <option value="Top Up Steam Wallet">Top Up Steam Wallet</option>
+                <option value="Top Up Google Play">Top Up Google Play</option>
+                <option value="Top Up iTunes / App Store">Top Up iTunes / App Store</option>
+                <option value="Voucher Netflix">Voucher Netflix</option>
+                <option value="Voucher Spotify">Voucher Spotify</option>
+                <option value="Voucher YouTube Premium">Voucher YouTube Premium</option>
+              </optgroup>
+
+              <optgroup label="📺 TV Kabel &amp; Internet">
+                <option value="Bayar Tagihan IndiHome (Telkom)">Bayar IndiHome (Telkom)</option>
+                <option value="Bayar Tagihan MNC Play">Bayar MNC Play</option>
+                <option value="Bayar Tagihan First Media">Bayar First Media</option>
+                <option value="Bayar Tagihan MyRepublic">Bayar MyRepublic</option>
+                <option value="Bayar Tagihan Biznet">Bayar Biznet</option>
+                <option value="Bayar Tagihan CBN">Bayar CBN</option>
+                <option value="Bayar Tagihan Iconnet (PLN)">Bayar Iconnet (PLN)</option>
+              </optgroup>
+
+              <optgroup label="🚗 Transportasi">
+                <option value="Bayar Tilang Elektronik (ETLE)">Bayar Tilang Elektronik (ETLE)</option>
+                <option value="Isi Saldo e-Toll (BRI e-Toll)">Isi Saldo e-Toll BRI</option>
+                <option value="Isi Saldo e-Money (Mandiri)">Isi Saldo e-Money Mandiri</option>
+                <option value="Isi Saldo Flazz (BCA)">Isi Saldo Flazz BCA</option>
+                <option value="Isi Saldo TapCash (BNI)">Isi Saldo TapCash BNI</option>
+                <option value="Isi Saldo Brizzi (BRI)">Isi Saldo Brizzi BRI</option>
+                <option value="Bayar Parkir">Bayar Parkir</option>
+                <option value="Tiket KAI (Kereta Api)">Tiket KAI (Kereta Api)</option>
+                <option value="Tiket Bus / Travel">Tiket Bus / Travel</option>
+                <option value="Tiket Pesawat">Tiket Pesawat</option>
+              </optgroup>
+
+              <optgroup label="📋 Kartu Kredit &amp; Cicilan">
+                <option value="Bayar Tagihan Kartu Kredit BRI">Bayar Kartu Kredit BRI</option>
+                <option value="Bayar Tagihan Kartu Kredit BCA">Bayar Kartu Kredit BCA</option>
+                <option value="Bayar Tagihan Kartu Kredit BNI">Bayar Kartu Kredit BNI</option>
+                <option value="Bayar Tagihan Kartu Kredit Mandiri">Bayar Kartu Kredit Mandiri</option>
+                <option value="Bayar Tagihan Kartu Kredit CIMB Niaga">Bayar Kartu Kredit CIMB Niaga</option>
+                <option value="Bayar Tagihan Kartu Kredit Danamon">Bayar Kartu Kredit Danamon</option>
+                <option value="Bayar Tagihan Kartu Kredit Permata">Bayar Kartu Kredit Permata</option>
+                <option value="Bayar Tagihan Kartu Kredit Mega">Bayar Kartu Kredit Mega</option>
+                <option value="Bayar Cicilan Kredit (Akulaku)">Bayar Cicilan Akulaku</option>
+                <option value="Bayar Cicilan Kredit (Kredivo)">Bayar Cicilan Kredivo</option>
+                <option value="Bayar Pinjaman Online">Bayar Pinjaman Online</option>
+              </optgroup>
+
+              <optgroup label="🏛️ Pajak &amp; Pemerintah">
+                <option value="Bayar Pajak PBB">Bayar Pajak PBB</option>
+                <option value="Bayar Pajak PPh">Bayar Pajak PPh</option>
+                <option value="Bayar Pajak PPN">Bayar Pajak PPN</option>
+                <option value="Bayar Pajak Kendaraan (STNK/PKB)">Bayar Pajak Kendaraan (PKB/STNK)</option>
+                <option value="Bayar SAMSAT Online">Bayar SAMSAT Online</option>
+                <option value="Bayar Retribusi Daerah">Bayar Retribusi Daerah</option>
+                <option value="Setoran PNBP">Setoran PNBP</option>
+              </optgroup>
+
+              <optgroup label="📚 Pendidikan">
+                <option value="Bayar SPP Sekolah">Bayar SPP Sekolah</option>
+                <option value="Bayar UKT / SPP Kuliah">Bayar UKT / SPP Kuliah</option>
+                <option value="Bayar Kursus / Bimbel">Bayar Kursus / Bimbel</option>
+              </optgroup>
+
+              <optgroup label="💵 Tunai">
+                <option value="Tarik Tunai">Tarik Tunai</option>
+                <option value="Setor Tunai">Setor Tunai</option>
+                <option value="Tarik Tunai Tanpa Kartu">Tarik Tunai Tanpa Kartu</option>
+              </optgroup>
+
+              <optgroup label="ℹ️ Informasi Rekening">
+                <option value="Cek Saldo">Cek Saldo</option>
+                <option value="Cetak Mutasi Rekening">Cetak Mutasi Rekening</option>
+                <option value="Ganti PIN">Ganti PIN</option>
+              </optgroup>
+
+              <optgroup label="✍️ Lainnya">
+                <option value="Lainnya (ketik manual)">Lainnya (ketik manual)…</option>
+              </optgroup>
+            </select>
           </div>
           <div class="field">
             <label>Nama Pengirim</label>
@@ -484,9 +714,8 @@ body {
         </div>
 
         <div class="btn-row">
-          <button class="btn-print no-print" onclick="window.print()">🖨️ Cetak via Browser</button>
           <button class="btn-save no-print" id="btnSave">💾 Simpan sebagai Gambar</button>
-
+          <button class="btn-reset no-print" id="btnReset" onclick="resetForm()">🔄 Reset Semua</button>
         </div>
       </div>
     </div>
@@ -598,8 +827,27 @@ function updateReceipt() {
   rTotalBox.textContent   = idrFmt(String(nom + adm));
 }
 
-[fNamaAgen,fStatus,fDatetime,fNamaPenerima,fRekTujuan,fJenis,fNamaPengirim,fBankPengirim,fBankPenerima,fDariRek,fNoRef,fBerita]
+[fNamaAgen,fStatus,fDatetime,fNamaPenerima,fRekTujuan,fNamaPengirim,fBankPengirim,fBankPenerima,fDariRek,fNoRef,fBerita]
   .forEach(el => el.addEventListener('input', updateReceipt));
+
+// fJenis adalah <select> — gunakan 'change'
+fJenis.addEventListener('change', () => {
+  const val = fJenis.value;
+  if (val === 'Lainnya (ketik manual)') {
+    const custom = prompt('Ketik jenis transaksi:');
+    if (custom && custom.trim()) {
+      // Tambahkan option baru dan pilih
+      const opt = document.createElement('option');
+      opt.value = custom.trim();
+      opt.textContent = custom.trim();
+      fJenis.appendChild(opt);
+      fJenis.value = custom.trim();
+    } else {
+      fJenis.value = '';
+    }
+  }
+  updateReceipt();
+});
 [fNominal,fAdmin].forEach(el => el.addEventListener('input',()=>{ fmtInput(el); updateReceipt(); }));
 
 // Upload
@@ -627,6 +875,37 @@ function resetUpload() {
   fileInput.value=''; scanBtn.disabled=true;
   progressWrap.classList.remove('show'); setStatus('','');
   rawToggle.style.display='none'; rawBox.style.display='none';
+}
+
+function resetForm() {
+  if (!confirm('Reset semua data? Semua isian akan dihapus.')) return;
+
+  // Reset upload & scan
+  resetUpload();
+
+  // Reset semua field teks
+  fNamaAgen.value     = 'KIKI CELLULER';
+  fStatus.value       = 'Transaksi Berhasil';
+  fDatetime.value     = '';
+  fNominal.value      = '';
+  fNamaPenerima.value = '';
+  fBankPenerima.value = '';
+  fRekTujuan.value    = '';
+  fNamaPengirim.value = '';
+  fBankPengirim.value = '';
+  fDariRek.value      = '';
+  fNoRef.value        = '';
+  fBerita.value       = '';
+  fAdmin.value        = '';
+
+  // Reset select jenis transaksi
+  fJenis.value = '';
+
+  // Hapus class auto-filled dari semua elemen
+  document.querySelectorAll('.auto-filled').forEach(el => el.classList.remove('auto-filled'));
+
+  // Update tampilan struk
+  updateReceipt();
 }
 function toggleRaw() {
   rawBox.style.display = rawBox.style.display==='block'?'none':'block';
@@ -825,103 +1104,370 @@ function parseOCR(text) {
   if (rekTujuan) r.rekTujuan = rekTujuan.trim().replace(/\s+/g,' ');
 
   // ── 5. JENIS TRANSAKSI ──
-  // BCA: "Transfer ke Rekening BCA"
-  // BRI normal: "Transfer Bank BRI"
-  // BRI BI-FAST: "Transfer BI-FAST" — jangan terpotong di "Transfer BI"
-  let jenis = '';
+  // Langkah 1: ambil teks mentah dari label "Jenis Transaksi"
+  let jenisRaw = '';
   for (let i = 0; i < lines.length; i++) {
     if (/Jenis\s*Transaksi/i.test(lines[i])) {
-      // Ambil sisa baris setelah label
       const after = lines[i].replace(/Jenis\s*Transaksi/i,'').replace(/^[\s:\-]+/,'').trim();
-      if (after) { jenis = after; break; }
-      // Atau baris berikut
-      if (i+1 < lines.length) { jenis = lines[i+1].trim(); break; }
+      if (after) { jenisRaw = after; break; }
+      if (i+1 < lines.length) { jenisRaw = lines[i+1].trim(); break; }
     }
   }
-  // Fallback regex — tangkap sampai akhir kata termasuk "BI-FAST"
-  if (!jenis) {
-    const jtM = full.match(/Jenis\s*Transaksi\s*[:\-]?\s*(Transfer[\w\s\-FAST]{3,40})/i);
-    if (jtM) jenis = jtM[1].trim();
+  if (!jenisRaw) {
+    const jtM = full.match(/Jenis\s*Transaksi\s*[:\-]?\s*(.{3,60}?)(?:\n|$)/i);
+    if (jtM) jenisRaw = jtM[1].trim();
   }
-  if (jenis) r.jenis = jenis.replace(/\s+/g,' ').trim();
+
+  // Langkah 2: normalisasi & smart-match ke pilihan dropdown
+  const t = (jenisRaw + ' ' + full).toUpperCase();
+
+  // Daftar aturan: [regex_matcher, nilai_option_di_dropdown]
+  const jenisRules = [
+    // ── BI-FAST spesifik (cek duluan supaya tidak tertangkap "Transfer ke X" biasa)
+    [/BI.?FAST.*BRI|BRI.*BI.?FAST/i,           'Transfer BI-FAST ke BRI'],
+    [/BI.?FAST.*BCA|BCA.*BI.?FAST/i,           'Transfer BI-FAST ke BCA'],
+    [/BI.?FAST.*BNI|BNI.*BI.?FAST/i,           'Transfer BI-FAST ke BNI'],
+    [/BI.?FAST.*MANDIRI|MANDIRI.*BI.?FAST/i,   'Transfer BI-FAST ke Mandiri'],
+    [/BI.?FAST.*BSI|BSI.*BI.?FAST/i,           'Transfer BI-FAST ke BSI'],
+    [/BI.?FAST.*BTN|BTN.*BI.?FAST/i,           'Transfer BI-FAST ke BTN'],
+    [/BI.?FAST.*CIMB|CIMB.*BI.?FAST/i,         'Transfer BI-FAST ke CIMB Niaga'],
+    [/BI.?FAST.*DANAMON|DANAMON.*BI.?FAST/i,   'Transfer BI-FAST ke Danamon'],
+    [/BI.?FAST.*PERMATA|PERMATA.*BI.?FAST/i,   'Transfer BI-FAST ke Permata'],
+    [/BI.?FAST.*MEGA|MEGA.*BI.?FAST/i,         'Transfer BI-FAST ke Mega'],
+    [/BI.?FAST.*JAGO|JAGO.*BI.?FAST/i,         'Transfer BI-FAST ke Jago'],
+    [/BI.?FAST.*JENIUS|JENIUS.*BI.?FAST/i,     'Transfer BI-FAST ke Jenius'],
+    [/BI.?FAST.*SEABANK|SEABANK.*BI.?FAST/i,   'Transfer BI-FAST ke Seabank'],
+    [/BI.?FAST/i,                               'Transfer BI-FAST'],
+
+    // ── Transfer sesama bank (cek "sesama" atau "ke rekening [bank] sendiri")
+    [/SESAMA\s*BRI|TRANSFER\s*BRI\s*KE\s*BRI/i,         'Transfer Sesama BRI'],
+    [/SESAMA\s*BCA|TRANSFER\s*BCA\s*KE\s*BCA/i,         'Transfer Sesama BCA'],
+    [/SESAMA\s*BNI|TRANSFER\s*BNI\s*KE\s*BNI/i,         'Transfer Sesama BNI'],
+    [/SESAMA\s*MANDIRI/i,                                 'Transfer Sesama Mandiri'],
+    [/SESAMA\s*BSI/i,                                     'Transfer Sesama BSI'],
+    [/SESAMA\s*BTN/i,                                     'Transfer Sesama BTN'],
+    [/SESAMA\s*CIMB/i,                                    'Transfer Sesama CIMB Niaga'],
+    [/SESAMA\s*DANAMON/i,                                 'Transfer Sesama Danamon'],
+    [/SESAMA\s*PERMATA/i,                                 'Transfer Sesama Permata'],
+    [/SESAMA\s*MEGA/i,                                    'Transfer Sesama Mega'],
+
+    // ── Transfer ke bank nasional
+    [/TRANSFER.*(KE|TO|→).*\bBRI\b|TRANSFER\s+BANK\s+BRI/i,       'Transfer ke BRI'],
+    [/TRANSFER.*(KE|TO|→).*\bBCA\b|KE\s+REKENING\s+BCA/i,         'Transfer ke BCA'],
+    [/TRANSFER.*(KE|TO|→).*\bBNI\b/i,                              'Transfer ke BNI'],
+    [/TRANSFER.*(KE|TO|→).*MANDIRI/i,                              'Transfer ke Mandiri'],
+    [/TRANSFER.*(KE|TO|→).*BSI|BANK\s+SYARIAH\s+INDONESIA/i,      'Transfer ke BSI'],
+    [/TRANSFER.*(KE|TO|→).*BTN/i,                                  'Transfer ke BTN'],
+    [/TRANSFER.*(KE|TO|→).*CIMB/i,                                 'Transfer ke CIMB Niaga'],
+    [/TRANSFER.*(KE|TO|→).*DANAMON/i,                              'Transfer ke Danamon'],
+    [/TRANSFER.*(KE|TO|→).*PERMATA/i,                              'Transfer ke Permata'],
+    [/TRANSFER.*(KE|TO|→).*\bMEGA\b/i,                             'Transfer ke Mega'],
+    [/TRANSFER.*(KE|TO|→).*PANIN/i,                                'Transfer ke Panin'],
+    [/TRANSFER.*(KE|TO|→).*OCBC/i,                                 'Transfer ke OCBC'],
+    [/TRANSFER.*(KE|TO|→).*MAYBANK/i,                              'Transfer ke Maybank'],
+    [/TRANSFER.*(KE|TO|→).*COMMONWEALTH/i,                         'Transfer ke Commonwealth'],
+    [/TRANSFER.*(KE|TO|→).*STANDARD\s*CHARTERED/i,                 'Transfer ke Standard Chartered'],
+    [/TRANSFER.*(KE|TO|→).*CITIBANK|CITI\b/i,                      'Transfer ke Citibank'],
+    [/TRANSFER.*(KE|TO|→).*HSBC/i,                                 'Transfer ke HSBC'],
+    [/TRANSFER.*(KE|TO|→).*\bDBS\b/i,                              'Transfer ke DBS'],
+    [/TRANSFER.*(KE|TO|→).*\bUOB\b/i,                              'Transfer ke UOB'],
+
+    // ── Bank Daerah (BPD)
+    [/BJB|JABAR\s*BANTEN|BANK\s*JABAR/i,           'Transfer ke BPD Jawa Barat (BJB)'],
+    [/BANK\s*JATENG|BPD\s*JAWA\s*TENGAH/i,        'Transfer ke BPD Jawa Tengah'],
+    [/BANK\s*JATIM|BPD\s*JAWA\s*TIMUR/i,          'Transfer ke BPD Jawa Timur (Bank Jatim)'],
+    [/BANK\s*DKI/i,                                 'Transfer ke BPD DKI'],
+    [/BANK\s*BPD\s*DIY|BANK\s*DIY/i,               'Transfer ke BPD DIY'],
+    [/BANK\s*BPD\s*BALI|BPD\s*BALI/i,              'Transfer ke BPD Bali'],
+    [/BANK\s*SUMUT|SUMATERA\s*UTARA/i,             'Transfer ke BPD Sumatera Utara (Bank Sumut)'],
+    [/BANK\s*NAGARI|SUMATERA\s*BARAT/i,            'Transfer ke BPD Sumatera Barat (Bank Nagari)'],
+    [/SUMSEL\s*BABEL|SUMATERA\s*SELATAN/i,         'Transfer ke BPD Sumatera Selatan (Bank Sumsel Babel)'],
+    [/RIAU\s*KEPRI|BPD\s*RIAU/i,                   'Transfer ke BPD Riau Kepri'],
+    [/BANKAL|KALIMANTAN\s*SELATAN/i,               'Transfer ke BPD Kalimantan Selatan (Bankal)'],
+    [/BANKALTIMTARA|KALIMANTAN\s*TIMUR/i,          'Transfer ke BPD Kalimantan Timur (Bankaltimtara)'],
+    [/SULUTGO|SULAWESI\s*UTARA/i,                  'Transfer ke BPD Sulawesi Utara (Bank SulutGo)'],
+    [/SULSELBAR|SULAWESI\s*SELATAN/i,              'Transfer ke BPD Sulawesi Selatan (Bank Sulselbar)'],
+    [/BPD\s*NTT/i,                                  'Transfer ke BPD NTT'],
+    [/BPD\s*NTB/i,                                  'Transfer ke BPD NTB'],
+    [/BPD\s*PAPUA/i,                                'Transfer ke BPD Papua'],
+    [/BANK\s*ACEH/i,                                'Transfer ke BPD Aceh (Bank Aceh Syariah)'],
+    [/BPD\s*LAMPUNG/i,                              'Transfer ke BPD Lampung'],
+    [/BPD\s*BENGKULU/i,                             'Transfer ke BPD Bengkulu'],
+    [/BPD\s*JAMBI/i,                                'Transfer ke BPD Jambi'],
+    [/KALIMANTAN\s*BARAT/i,                         'Transfer ke BPD Kalimantan Barat'],
+    [/KALIMANTAN\s*TENGAH/i,                        'Transfer ke BPD Kalimantan Tengah'],
+    [/MALUKU/i,                                     'Transfer ke BPD Maluku dan Maluku Utara'],
+    [/SULAWESI\s*TENGAH/i,                          'Transfer ke BPD Sulawesi Tengah'],
+    [/SULAWESI\s*TENGGARA/i,                        'Transfer ke BPD Sulawesi Tenggara'],
+
+    // ── Bank Digital
+    [/JENIUS/i,       'Transfer ke Jenius (BTPN)'],
+    [/\bBLU\b.*BCA|BCA.*\bBLU\b/i, 'Transfer ke Blu (BCA Digital)'],
+    [/BANK\s*JAGO|\bJAGO\b/i,      'Transfer ke Jago (Bank Jago)'],
+    [/DIGIBANK|DBS\s*DIGITAL/i,    'Transfer ke Digibank (DBS)'],
+    [/MOTION\s*BANKING|MNC\s*BANK/i,'Transfer ke Motion Banking (MNC Bank)'],
+    [/WOKEE|BUKOPIN/i,             'Transfer ke Wokee (Bukopin)'],
+    [/ALLO\s*BANK/i,               'Transfer ke Allo Bank'],
+    [/BANK\s*RAYA|BRI\s*AGRO/i,   'Transfer ke Bank Raya (BRI Agro)'],
+    [/SEABANK/i,                   'Transfer ke Seabank'],
+    [/NEO\s*COMMERCE|\bBNC\b/i,   'Transfer ke Neo Commerce (BNC)'],
+    [/SUPERBANK/i,                 'Transfer ke Superbank'],
+    [/SAQU/i,                      'Transfer ke Bank Saqu (Jago)'],
+
+    // ── Listrik PLN
+    [/TOKEN\s*LISTRIK|PLN\s*PRABAYAR|LISTRIK\s*PRABAYAR/i, 'Bayar Listrik PLN Prabayar (Token)'],
+    [/PLN\s*PASCABAYAR|TAGIHAN\s*LISTRIK|LISTRIK\s*PASCABAYAR/i, 'Bayar Listrik PLN Pascabayar'],
+    [/NON.?TAGLIS/i,                'Bayar Listrik PLN Non-Taglis'],
+    [/PLN|LISTRIK/i,                'Bayar Listrik PLN Prabayar (Token)'],
+
+    // ── PDAM / Air
+    [/TIRTA\s*MOEDAL/i,  'Bayar PDAM Tirta Moedal'],
+    [/TIRTA\s*LAWU/i,    'Bayar PDAM Tirta Lawu'],
+    [/TIRTA\s*PAKUAN/i,  'Bayar PDAM Tirta Pakuan'],
+    [/TIRTA\s*KENCANA/i, 'Bayar PDAM Tirta Kencana'],
+    [/PDAM|AIR\s*MINUM/i,'Bayar PDAM'],
+
+    // ── BPJS
+    [/BPJS\s*KETENAGAKERJAAN|BPJS\s*TK/i, 'Bayar BPJS Ketenagakerjaan'],
+    [/BPJS\s*KESEHATAN|BPJS/i,             'Bayar BPJS Kesehatan'],
+
+    // ── Pulsa & Paket Data
+    [/PAKET\s*DATA.*TELKOMSEL|TELKOMSEL.*PAKET/i, 'Isi Paket Data Telkomsel'],
+    [/PAKET\s*DATA.*INDOSAT|INDOSAT.*PAKET/i,     'Isi Paket Data Indosat'],
+    [/PAKET\s*DATA.*\bXL\b|\bXL\b.*PAKET/i,       'Isi Paket Data XL'],
+    [/PAKET\s*DATA.*AXIS|AXIS.*PAKET/i,            'Isi Paket Data Axis'],
+    [/PAKET\s*DATA.*TRI|TRI.*PAKET|\b3\b.*PAKET/i,'Isi Paket Data Tri'],
+    [/PAKET\s*DATA.*SMARTFREN|SMARTFREN.*PAKET/i, 'Isi Paket Data Smartfren'],
+    [/PULSA.*TELKOMSEL|TELKOMSEL/i,  'Isi Pulsa Telkomsel'],
+    [/PULSA.*INDOSAT|INDOSAT|IM3|OOREDOO/i, 'Isi Pulsa Indosat (IM3)'],
+    [/PULSA.*\bXL\b|\bXL\b.*AXIATA/i, 'Isi Pulsa XL Axiata'],
+    [/PULSA.*AXIS|\bAXIS\b/i,        'Isi Pulsa Axis'],
+    [/PULSA.*TRI|\bTRI\b|\b3\b.*SELULER/i, 'Isi Pulsa Tri (3)'],
+    [/SMARTFREN/i,                   'Isi Pulsa Smartfren'],
+
+    // ── E-Wallet
+    [/GOPAY/i,      'Isi Ulang GoPay'],
+    [/\bOVO\b/i,    'Isi Ulang OVO'],
+    [/\bDANA\b/i,   'Isi Ulang DANA'],
+    [/SHOPEEPAY|SHOPEE\s*PAY/i, 'Isi Ulang ShopeePay'],
+    [/LINKAJA|LINK\s*AJA/i,     'Isi Ulang LinkAja'],
+    [/SAKUKU/i,     'Isi Ulang Sakuku (BCA)'],
+    [/I\.?SAKU|INDOMARET\s*WALLET/i, 'Isi Ulang i.Saku (Indomaret)'],
+    [/\bDOKU\b/i,   'Isi Ulang DOKU'],
+    [/PAYTREN/i,    'Isi Ulang Paytren'],
+    [/\bFLIP\b/i,   'Isi Ulang Flip'],
+
+    // ── Game & Hiburan
+    [/MOBILE\s*LEGENDS|MOONTON/i, 'Top Up Mobile Legends'],
+    [/FREE\s*FIRE|GARENA/i,       'Top Up Free Fire'],
+    [/PUBG/i,                     'Top Up PUBG Mobile'],
+    [/VALORANT/i,                 'Top Up Valorant'],
+    [/STEAM/i,                    'Top Up Steam Wallet'],
+    [/GOOGLE\s*PLAY/i,            'Top Up Google Play'],
+    [/ITUNES|APP\s*STORE/i,       'Top Up iTunes / App Store'],
+    [/NETFLIX/i,                  'Voucher Netflix'],
+    [/SPOTIFY/i,                  'Voucher Spotify'],
+    [/YOUTUBE\s*PREMIUM/i,        'Voucher YouTube Premium'],
+
+    // ── TV & Internet
+    [/INDIHOME|TELKOM\s*HOME/i,  'Bayar Tagihan IndiHome (Telkom)'],
+    [/MNC\s*PLAY/i,              'Bayar Tagihan MNC Play'],
+    [/FIRST\s*MEDIA/i,           'Bayar Tagihan First Media'],
+    [/MYREPUBLIC/i,              'Bayar Tagihan MyRepublic'],
+    [/BIZNET/i,                  'Bayar Tagihan Biznet'],
+    [/\bCBN\b/i,                 'Bayar Tagihan CBN'],
+    [/ICONNET/i,                 'Bayar Tagihan Iconnet (PLN)'],
+
+    // ── Transportasi
+    [/TILANG\s*ELEKTRONIK|ETLE/i,  'Bayar Tilang Elektronik (ETLE)'],
+    [/E.?TOLL|ETOLL|TOLL/i,        'Isi Saldo e-Toll (BRI e-Toll)'],
+    [/E.?MONEY.*MANDIRI|MANDIRI.*E.?MONEY/i, 'Isi Saldo e-Money (Mandiri)'],
+    [/FLAZZ/i,   'Isi Saldo Flazz (BCA)'],
+    [/TAPCASH/i, 'Isi Saldo TapCash (BNI)'],
+    [/BRIZZI/i,  'Isi Saldo Brizzi (BRI)'],
+    [/KAI|KERETA\s*API/i, 'Tiket KAI (Kereta Api)'],
+    [/TIKET\s*BUS|TIKET\s*TRAVEL/i, 'Tiket Bus / Travel'],
+    [/TIKET\s*PESAWAT|AIRLINE/i,    'Tiket Pesawat'],
+
+    // ── Kartu Kredit & Cicilan
+    [/KARTU\s*KREDIT.*BRI|CC.*BRI/i,      'Bayar Tagihan Kartu Kredit BRI'],
+    [/KARTU\s*KREDIT.*BCA|CC.*BCA/i,      'Bayar Tagihan Kartu Kredit BCA'],
+    [/KARTU\s*KREDIT.*BNI|CC.*BNI/i,      'Bayar Tagihan Kartu Kredit BNI'],
+    [/KARTU\s*KREDIT.*MANDIRI/i,          'Bayar Tagihan Kartu Kredit Mandiri'],
+    [/KARTU\s*KREDIT.*CIMB/i,             'Bayar Tagihan Kartu Kredit CIMB Niaga'],
+    [/KARTU\s*KREDIT.*DANAMON/i,          'Bayar Tagihan Kartu Kredit Danamon'],
+    [/KARTU\s*KREDIT.*PERMATA/i,          'Bayar Tagihan Kartu Kredit Permata'],
+    [/KARTU\s*KREDIT.*MEGA/i,             'Bayar Tagihan Kartu Kredit Mega'],
+    [/AKULAKU/i,  'Bayar Cicilan Kredit (Akulaku)'],
+    [/KREDIVO/i,  'Bayar Cicilan Kredit (Kredivo)'],
+    [/PINJAMAN\s*ONLINE|PINJOL/i, 'Bayar Pinjaman Online'],
+
+    // ── Pajak & Pemerintah
+    [/PAJAK\s*PBB|PBB/i,         'Bayar Pajak PBB'],
+    [/PPH|PAJAK\s*PENGHASILAN/i, 'Bayar Pajak PPh'],
+    [/PPN|PAJAK\s*PERTAMBAHAN/i, 'Bayar Pajak PPN'],
+    [/PAJAK\s*KENDARAAN|PKB|STNK/i, 'Bayar Pajak Kendaraan (STNK/PKB)'],
+    [/SAMSAT/i,     'Bayar SAMSAT Online'],
+    [/RETRIBUSI/i,  'Bayar Retribusi Daerah'],
+    [/PNBP/i,       'Setoran PNBP'],
+
+    // ── Pendidikan
+    [/\bSPP\b.*SEKOLAH|SEKOLAH.*\bSPP\b/i, 'Bayar SPP Sekolah'],
+    [/UKT|SPP\s*KULIAH|BIAYA\s*KULIAH/i,   'Bayar UKT / SPP Kuliah'],
+    [/KURSUS|BIMBEL|LES\s*PRIVAT/i,        'Bayar Kursus / Bimbel'],
+
+    // ── Tunai
+    [/TARIK\s*TUNAI\s*TANPA\s*KARTU/i, 'Tarik Tunai Tanpa Kartu'],
+    [/TARIK\s*TUNAI|CASH\s*OUT|WITHDRAWAL/i, 'Tarik Tunai'],
+    [/SETOR\s*TUNAI|CASH\s*IN|SETORAN/i,     'Setor Tunai'],
+
+    // ── Informasi
+    [/CEK\s*SALDO|CHECK\s*BALANCE/i, 'Cek Saldo'],
+    [/MUTASI/i,   'Cetak Mutasi Rekening'],
+    [/GANTI\s*PIN|CHANGE\s*PIN/i, 'Ganti PIN'],
+  ];
+
+  // Coba cocokkan dari teks OCR mentah dulu, lalu dari full text
+  let jenisMatched = '';
+  const searchTargets = [jenisRaw, full]; // prioritas: label dulu, lalu seluruh teks
+  for (const target of searchTargets) {
+    if (jenisMatched) break;
+    for (const [rx, val] of jenisRules) {
+      if (rx.test(target)) { jenisMatched = val; break; }
+    }
+  }
+
+  // Fallback: simpan teks mentah jika ada tapi tidak cocok dengan rules
+  if (!jenisMatched && jenisRaw) jenisMatched = jenisRaw;
+
+  if (jenisMatched) r.jenis = jenisMatched.replace(/\s+/g,' ').trim();
 
   // ── 6. DARI REKENING ──
-  // BCA: "159 - 0** - **06" (setelah label "Dari Rekening")
-  // BRI normal: "5870 **** **** 533"
-  // BRI BI-FAST Sumber Dana: "3685 **** **** 532" → OCR bisa: "3685 *rer vers 530"
-  //   (diawali digit atau *, diikuti kata-kata/bintang campuran)
-  let dariRek = extractAfterLabel(lines,
-    [/Dari\s*Rekening/i, /From\s*Account/i, /Source\s*Account/i],
-    /([\d\*][\d\s\-\*]{6,30})/
-  );
+  // Format BRI: "5870 **** **** 533" / "3685 **** **** 532"
+  // OCR noise ringan : "5870 Aven 2245.533"
+  // OCR noise berat  : "3685 111 +e S3D"  ← awal 4 digit, akhir ada digit, tengah noise
+  // Format BCA: "159 - 0** - **06"
+  // Strategi: 4 lapis — label eksplisit → blok Sumber Dana → scan seluruh teks → fallback angka
 
-  if (!dariRek) {
-    // Pola masked rekening: diawali digit/bintang, ada bagian tersensor
-    const isMaskedRek = s => {
-      // "5870 **** **** 533" atau "3685 **** **** 532" — bersih
-      if (/^[\d\*]{4}\s+[\*\d]{4}\s+[\*\d]{4}\s+\d{3,4}$/.test(s)) return true;
-      // OCR misread ringan: "5870 vex axex 533"
-      if (/^[\d\*]{3,5}\s+[\*a-z]{2,8}\s+[\*a-z]{2,8}\s+\d{3,4}$/i.test(s)) return true;
-      // OCR misread berat: "3685 111 +e 53D" — 4 digit awal, 3-4 token di tengah, 3+ char di akhir
-      // Cukup: diawali 4 digit, diakhiri 2-4 digit/huruf, total ≥ 4 token
-      if (/^(\d{4})\s+\S+\s+\S+\s+([A-Z0-9]{2,5})$/i.test(s)) return true;
-      return false;
-    };
-    const rekonstRek = s => {
-      // Ekstrak token pertama (4 digit awal) dan token terakhir
-      const tokens = s.trim().split(/\s+/);
-      if (tokens.length >= 3) {
-        const first = tokens[0];
-        // Token terakhir: ambil hanya digit-nya
-        const lastDigits = tokens[tokens.length - 1].replace(/\D/g, '');
-        if (/^\d{3,5}$/.test(first) && lastDigits.length >= 2) {
-          return `${first} **** **** ${lastDigits}`;
-        }
+  // Pre-extract No. Ref digits sekarang (parsing lengkap di bagian 7)
+  // supaya bisa di-blacklist saat cari dariRek
+  const _noRefEarly = (() => {
+    for (let i = 0; i < lines.length; i++) {
+      if (/No\.?\s*Ref(?:erensi)?|Reference\s*No|Ref\.?\s*No/i.test(lines[i])) {
+        const after = lines[i].replace(/No\.?\s*Ref(?:erensi)?|Reference\s*No|Ref\.?\s*No/i,'').replace(/[:\-\s]/g,'');
+        if (after && /\d{6,}/.test(after)) return after.replace(/\D/g,'');
+        if (i+1 < lines.length) return lines[i+1].trim().replace(/\D/g,'');
       }
-      return s;
-    };
+    }
+    // Fallback: angka panjang setelah label No. Ref di full text
+    const m = full.match(/(?:No\.?\s*Ref(?:erensi)?|Reference\s*No)[^\d]*(\d{8,20})/i);
+    return m ? m[1] : '';
+  })();
 
+  const noRefDigits     = _noRefEarly;
+  const rekTujuanDigits = (r.rekTujuan || '').replace(/\D/g,'');
+  const isBlacklisted   = d => d.length > 0 && (d === rekTujuanDigits || d === noRefDigits);
+
+  // Helper: normalisasi baris rekening ber-noise → "XXXX **** **** YYY"
+  const rekonstRek = s => {
+    // Split by spasi, titik, tanda +, karakter non-alphanum
+    const tokens = s.trim().split(/[\s\.\+]+/).filter(Boolean);
+    if (tokens.length >= 2) {
+      const first     = tokens[0].replace(/\D/g,'');
+      const lastToken = tokens[tokens.length - 1];
+      // Token terakhir bisa "S3D" → ambil digitnya saja → "3"? terlalu sedikit
+      // Cari token terakhir yang mengandung ≥2 digit
+      let lastDigits = '';
+      for (let k = tokens.length - 1; k >= 1; k--) {
+        const d = tokens[k].replace(/\D/g,'');
+        if (d.length >= 2) { lastDigits = d; break; }
+      }
+      if (first.length >= 3 && lastDigits.length >= 2 && first !== lastDigits) {
+        return `${first} **** **** ${lastDigits}`;
+      }
+    }
+    return s.trim();
+  };
+
+  // Helper: apakah baris ini kemungkinan rekening pengirim?
+  const isMaskedRek = (s) => {
+    const digits = s.replace(/\D/g,'');
+    // Total digit harus 5–16 (rekening masked punya 7 digit terlihat + yang disensor)
+    if (digits.length < 4 || digits.length > 16) return false;
+    // Blacklist: jangan cocokkan No. Ref atau rekTujuan
+    if (isBlacklisted(digits)) return false;
+    // Harus diawali 3–5 digit (4 digit pertama rekening BRI)
+    if (!/^\d{3,5}/.test(s.trim())) return false;
+    // Format bersih: "5870 **** **** 533" atau "3685 **** **** 532"
+    if (/^\d{3,5}\s+[\*\d]{4}\s+[\*\d]{4}\s+\d{2,5}$/.test(s)) return true;
+    // Format BCA masked: "159 - 0** - **06"
+    if (/^\d[\d\-\s\*]{6,25}\d$/.test(s) && s.includes('*')) return true;
+    // Rekening tidak masked (semua digit bersih, ≥10 digit)
+    if (/^[\d\s\-]{10,25}$/.test(s) && digits.length >= 10) return true;
+    // OCR noise ringan: "5870 wxyz abcd 533" — 4 token, awal 4 digit, akhir digit
+    if (/^\d{3,5}\s+\S{1,8}\s+\S{1,8}\s+\S{1,6}$/.test(s) && /\d{2,}$/.test(s.replace(/\S+$/,'')) === false) return true;
+    // OCR noise dengan titik: "5870 Aven 2245.533"
+    if (/^\d{3,5}\s+\S+[\.\s]\S*\d{2,5}$/.test(s)) return true;
+    // OCR noise berat: "3685 111 +e S3D" — diawali 4 digit, ada campuran karakter, akhir ada digit
+    if (/^\d{3,5}\s+.{2,20}/.test(s) && /\d{2,}/.test(s.slice(5))) return true;
+    return false;
+  };
+
+  // Lapis 1: label eksplisit "Dari Rekening" / "From Account"
+  let dariRek = extractAfterLabel(lines,
+    [/Dari\s*Rekening/i, /From\s*Account/i, /Source\s*Account/i, /Rekening\s*Pengirim/i],
+    /([\d\*][\d\s\-\*\.]{4,30}[\d\*])/
+  );
+  if (dariRek && isBlacklisted(dariRek.replace(/\D/g,''))) dariRek = '';
+
+  // Lapis 2: scan blok "Sumber Dana" (BRI) — window 10 baris
+  if (!dariRek) {
     let sumberIdx = -1;
     for (let i = 0; i < lines.length; i++) {
       if (/Sumber\s*Dana/i.test(lines[i])) { sumberIdx = i; break; }
     }
-
     if (sumberIdx > -1) {
-      for (let j = sumberIdx+1; j < Math.min(sumberIdx+8, lines.length); j++) {
+      for (let j = sumberIdx + 1; j < Math.min(sumberIdx + 10, lines.length); j++) {
         const ln = lines[j].trim();
-        if (isMaskedRek(ln)) { dariRek = rekonstRek(ln); break; }
-        // Rekening tidak termasked: 10+ digit dengan spasi
-        if (/^[\d\s]{10,25}$/.test(ln) && ln.replace(/\D/g,'').length >= 8) {
-          const norm = ln.replace(/\D/g,'');
-          const rekTujuanNorm = (r.rekTujuan||'').replace(/\D/g,'');
-          if (norm !== rekTujuanNorm) { dariRek = ln; break; }
+        if (!ln) continue;
+        if (/^(Tujuan|Jenis\s*Transaksi|Amount|Nominal|Biaya|Total|No\.?\s*Ref|Notes|Catatan)/i.test(ln)) break;
+        if (isMaskedRek(ln)) {
+          const candidate = rekonstRek(ln);
+          if (!isBlacklisted(candidate.replace(/\D/g,''))) {
+            dariRek = candidate;
+            break;
+          }
         }
-        // Toleran OCR noise: diawali 4 digit, akhiri 3 digit, ada noise di tengah
-        const noiseM = ln.match(/^(\d{4})\s+[\*\w]{2,8}\s+[\*\w]{2,8}\s+(\d{3,4})$/i);
-        if (noiseM) { dariRek = `${noiseM[1]} **** **** ${noiseM[2]}`; break; }
-        if (/^(Jenis|Nominal|Biaya|Total|No\.?\s*Ref|Tujuan|Catatan|Alias)/i.test(ln)) break;
       }
-    }
-
-    // Fallback: scan semua baris
-    if (!dariRek) {
-      for (const ln of lines) {
-        if (isMaskedRek(ln.trim())) { dariRek = rekonstRek(ln.trim()); break; }
-      }
-    }
-    // Fallback 2: nomor panjang unik bukan rekTujuan
-    if (!dariRek) {
-      // Normalisasi rekTujuan untuk perbandingan (hapus spasi dan tanda baca)
-      const rekTujuanNorm = (r.rekTujuan || '').replace(/[\s\-\.]/g,'');
-      const allRekNos = [...full.matchAll(/\b(\d[\d\s]{12,20}\d)\b/g)]
-        .map(m => m[1].trim().replace(/\s+/g,' '))
-        .filter(s => {
-          const sNorm = s.replace(/[\s\-\.]/g,'');
-          return sNorm.length >= 10 && sNorm !== rekTujuanNorm;
-        });
-      if (allRekNos.length) dariRek = [...new Set(allRekNos)][0];
     }
   }
+
+  // Lapis 3: scan seluruh baris
+  if (!dariRek) {
+    for (const ln of lines) {
+      const s = ln.trim();
+      if (!s) continue;
+      if (isMaskedRek(s)) {
+        const candidate = rekonstRek(s);
+        if (!isBlacklisted(candidate.replace(/\D/g,''))) {
+          dariRek = candidate;
+          break;
+        }
+      }
+    }
+  }
+
+  // Lapis 4: fallback nomor panjang unik (EXCLUDE No. Ref & rekTujuan)
+  if (!dariRek) {
+    const allNums = [...full.matchAll(/\b(\d[\d\s]{8,18}\d)\b/g)]
+      .map(m => m[1].trim().replace(/\s+/g,' '))
+      .filter(s => {
+        const d = s.replace(/\D/g,'');
+        return d.length >= 8 && d.length <= 16 && !isBlacklisted(d);
+      });
+    if (allNums.length) dariRek = allNums[0];
+  }
+
   if (dariRek) r.dariRek = dariRek.trim().replace(/\s+/g,' ');
 
   // ── 6b. BANK PENGIRIM & BANK PENERIMA ──
@@ -1131,7 +1677,23 @@ scanBtn.addEventListener('click', async ()=>{
     if(d.admin)        { fAdmin.value       = d.admin.toLocaleString('id-ID');      markFilled(fAdmin, wrapAdmin);     filled++; }
     if(d.namaPenerima) { fNamaPenerima.value= d.namaPenerima;                       markFilled(fNamaPenerima);         filled++; }
     if(d.rekTujuan)    { fRekTujuan.value   = d.rekTujuan;                          markFilled(fRekTujuan);            filled++; }
-    if(d.jenis)        { fJenis.value       = d.jenis;                              markFilled(fJenis);                filled++; }
+    if(d.jenis) {
+      // Coba cocokkan nilai yang sudah di-map ke opsi dropdown yang ada
+      const allOptions = Array.from(fJenis.options);
+      const match = allOptions.find(o => o.value === d.jenis);
+      if (match) {
+        fJenis.value = d.jenis;
+      } else {
+        // Tidak ada di daftar — tambahkan sebagai opsi baru
+        const opt = document.createElement('option');
+        opt.value = d.jenis;
+        opt.textContent = d.jenis + ' (dari scan)';
+        fJenis.appendChild(opt);
+        fJenis.value = d.jenis;
+      }
+      fJenis.classList.add('auto-filled');
+      filled++;
+    }
     if(d.dariRek)      { fDariRek.value      = d.dariRek;                            markFilled(fDariRek);               filled++; }
     if(d.namaPengirim) { fNamaPengirim.value  = d.namaPengirim;                       markFilled(fNamaPengirim);          filled++; }
     if(d.bankPengirim) { fBankPengirim.value  = d.bankPengirim;                       markFilled(fBankPengirim);          filled++; }
