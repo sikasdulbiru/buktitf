@@ -1212,7 +1212,6 @@ window.addEventListener('appinstalled', () => {
 });
 
 // 3. Cek URL params dari Web Share Target GET (fallback jika POST tidak bisa)
-// Android bisa share URL gambar via GET params
 const urlParams = new URLSearchParams(window.location.search);
 const sharedUrl = urlParams.get('url') || urlParams.get('text');
 if (sharedUrl && sharedUrl.match(/\.(jpg|jpeg|png|webp)/i)) {
@@ -1223,6 +1222,23 @@ if (sharedUrl && sharedUrl.match(/\.(jpg|jpeg|png|webp)/i)) {
       loadFile(file);
       setTimeout(() => { if (!scanBtn.disabled) scanBtn.click(); }, 300);
     }).catch(() => {});
+}
+
+// 4. Auto-buka galeri saat app dibuka dari homescreen (standalone mode)
+// Hanya trigger jika tidak ada gambar yang sudah di-share / di-load
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                  || window.navigator.standalone === true;
+
+if (isStandalone && !sharedUrl) {
+  // Tunggu sebentar agar UI siap, lalu langsung buka file picker
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      // Hanya auto-open jika belum ada gambar ter-load
+      if (scanBtn.disabled) {
+        fileInput.click();
+      }
+    }, 400);
+  });
 }
 </script>
 </body>
