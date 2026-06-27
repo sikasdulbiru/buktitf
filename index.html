@@ -216,17 +216,57 @@ body {
 .tips-box strong { display:block; margin-bottom:4px; }
 .footer-note { text-align:center; font-size:11px; color:#bbb; margin-top:1.5rem; }
 
-/* ═══════════ PRINT ═══════════ */
+/* ═══════════ PRINT — Thermal 58mm ═══════════ */
 @media print {
   body { background:#fff; padding:0; margin:0; }
   .no-print { display:none !important; }
   .receipt-outer { justify-content:flex-start; padding:0; }
-  .receipt { width:72mm; box-shadow:none; border-radius:0; font-size:11px; }
-  .receipt-amount { font-size:20px; }
-  .receipt-row { padding:8px 14px; }
-  .receipt-admin-box { margin:0 14px 10px; }
-  .receipt-top { padding:16px 14px 12px; }
-  @page { size:80mm auto; margin:3mm; }
+
+  /* Lebar pas untuk kertas 58mm (area cetak ±50mm setelah margin) */
+  .receipt {
+    width: 50mm;
+    box-shadow: none;
+    border-radius: 0;
+    font-size: 14px;        /* naik dari 11px → huruf lebih besar & jelas */
+    font-family: 'Courier New', Courier, monospace; /* font thermal lebih tajam */
+  }
+
+  /* Nama agen / header */
+  .receipt-agent-name {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+
+  /* Status & datetime */
+  .receipt-status   { font-size: 14px; }
+  .receipt-datetime { font-size: 12px; }
+
+  /* Nominal besar — supaya mencolok */
+  .receipt-amount { font-size: 22px; font-weight: 900; }
+
+  /* Baris data */
+  .receipt-row {
+    padding: 7px 10px;
+    font-size: 13px;
+  }
+  .receipt-row .rl { min-width: 80px; }
+
+  /* Box admin/total */
+  .receipt-admin-box  { margin: 0 10px 10px; }
+  .receipt-admin-row  { font-size: 13px; }
+  .receipt-admin-row.total-row { font-size: 14px; }
+
+  /* Top & footer padding lebih rapat */
+  .receipt-top    { padding: 12px 10px 10px; }
+  .receipt-footer { font-size: 11px; padding: 10px 10px 14px; }
+
+  /* No ref */
+  .receipt-top-ref      { font-size: 11px; }
+  .receipt-top-ref span { font-size: 11px; }
+
+  /* Ukuran halaman: 58mm lebar, tinggi otomatis, margin tipis */
+  @page { size: 58mm auto; margin: 2mm 3mm; }
 }
 </style>
 </head>
