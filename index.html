@@ -221,55 +221,120 @@ body {
 
 /* ═══════════ PRINT — Thermal 58mm ═══════════ */
 @media print {
-  body { background:#fff; padding:0; margin:0; }
-  .no-print { display:none !important; }
-  .receipt-outer { justify-content:flex-start; padding:0; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 
-  /* Lebar pas untuk kertas 58mm (area cetak ±50mm setelah margin) */
+  html, body {
+    background: #fff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 58mm !important;
+    min-height: unset !important;
+    height: auto !important;
+  }
+
+  .no-print { display: none !important; }
+
+  .container {
+    max-width: 58mm !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .preview-layout {
+    display: block !important;
+  }
+
+  .receipt-outer {
+    justify-content: flex-start !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .card {
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Struk utama */
   .receipt {
-    width: 50mm;
-    box-shadow: none;
-    border-radius: 0;
-    font-size: 14px;        /* naik dari 11px → huruf lebih besar & jelas */
-    font-family: 'Courier New', Courier, monospace; /* font thermal lebih tajam */
+    width: 52mm !important;
+    max-width: 52mm !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 11px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
-  /* Nama agen / header */
   .receipt-agent-name {
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: 1px;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+    padding-bottom: 6px !important;
+    margin-bottom: 8px !important;
   }
 
-  /* Status & datetime */
-  .receipt-status   { font-size: 14px; }
-  .receipt-datetime { font-size: 12px; }
+  .check-circle {
+    width: 36px !important;
+    height: 36px !important;
+    margin-bottom: 6px !important;
+  }
+  .check-circle svg { width: 18px !important; height: 18px !important; }
 
-  /* Nominal besar — supaya mencolok */
-  .receipt-amount { font-size: 22px; font-weight: 900; }
+  .receipt-status   { font-size: 11px !important; margin-bottom: 2px !important; }
+  .receipt-datetime { font-size: 10px !important; margin-bottom: 6px !important; }
+  .receipt-amount   { font-size: 16px !important; font-weight: 900 !important; }
 
-  /* Baris data */
+  .receipt-top {
+    padding: 8px 8px 8px !important;
+    border-bottom: 1px dashed #999 !important;
+  }
+
+  .receipt-top-ref      { font-size: 9px !important; margin-top: 6px !important; }
+  .receipt-top-ref span { font-size: 9px !important; }
+
+  .receipt-body { padding: 0 !important; }
+
   .receipt-row {
-    padding: 7px 10px;
-    font-size: 13px;
+    padding: 4px 8px !important;
+    font-size: 10px !important;
+    border-bottom: 1px dotted #ddd !important;
+    gap: 4px !important;
   }
-  .receipt-row .rl { min-width: 80px; }
+  .receipt-row:last-child { border-bottom: none !important; }
+  .receipt-row .rl { min-width: 68px !important; font-size: 10px !important; }
+  .receipt-row .rv { font-size: 10px !important; }
 
-  /* Box admin/total */
-  .receipt-admin-box  { margin: 0 10px 10px; }
-  .receipt-admin-row  { font-size: 13px; }
-  .receipt-admin-row.total-row { font-size: 14px; }
+  .receipt-admin-box {
+    margin: 4px 8px 6px !important;
+    padding: 6px 8px !important;
+    border: 1px solid #aaa !important;
+    border-radius: 4px !important;
+  }
+  .receipt-admin-row       { font-size: 10px !important; margin: 2px 0 !important; }
+  .receipt-admin-row.total-row {
+    font-size: 11px !important;
+    padding-top: 4px !important;
+    margin-top: 4px !important;
+    border-top: 1px dashed #aaa !important;
+  }
 
-  /* Top & footer padding lebih rapat */
-  .receipt-top    { padding: 12px 10px 10px; }
-  .receipt-footer { font-size: 11px; padding: 10px 10px 14px; }
+  .receipt-footer {
+    font-size: 9px !important;
+    padding: 6px 8px 8px !important;
+    border-top: 1px dashed #aaa !important;
+    line-height: 1.5 !important;
+  }
 
-  /* No ref */
-  .receipt-top-ref      { font-size: 11px; }
-  .receipt-top-ref span { font-size: 11px; }
-
-  /* Ukuran halaman: 58mm lebar, tinggi otomatis, margin tipis */
-  @page { size: 58mm auto; margin: 2mm 3mm; }
+  /* Ukuran halaman 58mm, tinggi auto, margin seminimal mungkin */
+  @page {
+    size: 58mm auto;
+    margin: 2mm 2mm 4mm 2mm;
+  }
 }
 </style>
 </head>
@@ -714,6 +779,7 @@ body {
         </div>
 
         <div class="btn-row">
+          <button class="btn-print no-print" id="btnPrint" onclick="cetakStruk()">🖨️ Cetak Struk (58mm)</button>
           <button class="btn-save no-print" id="btnSave">💾 Simpan sebagai Gambar</button>
           <button class="btn-reset no-print" id="btnReset" onclick="resetForm()">🔄 Reset Semua</button>
         </div>
@@ -1841,6 +1907,79 @@ if (isStandalone && !sharedUrl) {
       }
     }, 400);
   });
+}
+
+// ══════════════════════════════════════
+// CETAK STRUK — render PNG lalu share ke Thermer
+// ══════════════════════════════════════
+async function cetakStruk() {
+  const btn = document.getElementById('btnPrint');
+  const receipt = document.querySelector('.receipt');
+  if (!receipt) return;
+
+  if (typeof html2canvas === 'undefined') {
+    alert('Library html2canvas belum termuat. Pastikan ada koneksi internet.');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Membuat gambar...';
+
+  try {
+    // Render struk jadi canvas — scale 8 = ~560px lebar untuk 58mm (resolusi thermal ~200dpi)
+    const canvas = await html2canvas(receipt, {
+      scale: 8,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      width: receipt.offsetWidth,
+      height: receipt.offsetHeight,
+      windowWidth: receipt.offsetWidth,
+    });
+
+    // Nama file
+    const nama = (document.getElementById('fNamaPenerima').value.trim() || 'nasabah')
+                   .replace(/\s+/g, '-').toLowerCase();
+    const tgl  = (document.getElementById('fDatetime').value.trim() || '')
+                   .replace(/[\s\/:]/g, '-').substring(0, 15)
+                 || new Date().toLocaleDateString('id-ID').replace(/\//g,'-');
+    const filename = `struk-${nama}-${tgl}.png`;
+
+    const dataUrl = canvas.toDataURL('image/png');
+
+    // Coba Web Share API (Android Chrome — langsung bisa share ke Thermer)
+    const blob = await (await fetch(dataUrl)).blob();
+    const file = new File([blob], filename, { type: 'image/png' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: 'Struk Transfer',
+      });
+      btn.innerHTML = '✅ Dibagikan!';
+    } else {
+      // Fallback: download PNG
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = dataUrl;
+      link.click();
+      btn.innerHTML = '✅ PNG Tersimpan!';
+
+      // Tampilkan petunjuk
+      setTimeout(() => {
+        alert('📄 Gambar struk sudah tersimpan!\n\nCara cetak ke Thermer:\n1. Buka galeri → temukan file struk\n2. Tap tombol Share (bagikan)\n3. Pilih Thermal Printer / Thermer\n4. Cetak 🖨️');
+      }, 300);
+    }
+
+    setTimeout(() => { btn.innerHTML = '🖨️ Cetak Struk (58mm)'; btn.disabled = false; }, 3000);
+
+  } catch (err) {
+    if (err.name !== 'AbortError') {
+      alert('Gagal: ' + (err.message || 'Error tidak diketahui'));
+    }
+    btn.innerHTML = '🖨️ Cetak Struk (58mm)';
+    btn.disabled = false;
+  }
 }
 </script>
 </body>
