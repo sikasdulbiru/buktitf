@@ -981,10 +981,13 @@ function toggleRaw() {
 // ── Deteksi bank dari teks OCR ──
 function detectBank(text) {
   const t = text.toUpperCase();
-  if (t.includes('BI-FAST') || t.includes('BIFAST')) return 'BRI'; // BI-FAST tetap dari BRI
+  // Livin Mandiri harus dicek PERTAMA — punya logo "livin by mandiri" dan bisa ada "BI-FAST"
+  if (t.includes('LIVIN') || t.includes('PT BANK MANDIRI') || t.includes('MENARA MANDIRI')) return 'MANDIRI';
   if (t.includes('BCA') || t.includes('BANK CENTRAL ASIA')) return 'BCA';
   if (t.includes('BRI') || t.includes('BANK RAKYAT')) return 'BRI';
   if (t.includes('BNI') || t.includes('BANK NEGARA')) return 'BNI';
+  // BI-FAST dari BRI hanya jika tidak ada indikasi Mandiri
+  if (t.includes('BI-FAST') || t.includes('BIFAST')) return 'BRI';
   if (t.includes('MANDIRI')) return 'MANDIRI';
   return 'UNKNOWN';
 }
@@ -1102,6 +1105,127 @@ function parseOCR(text) {
   r.nominal = nominalVal;
   r.admin   = adminVal;
 
+  // ══════════════════════════════════════════════
+  // LIVIN BY MANDIRI — parsing khusus
+  // OCR lines dari Livin:
+  //   [09] Penerima
+  //   [10] ROMLI
+  //   [11] Bank Rakyat Indonesia - 368501008969532
+  //   [14] Metode Transfer BI Fast
+  //   [16] BI Fast 01000223082808   ← NO REF, bukan rekening!
+  //   [20] Rekening Sumber
+  //   [21] NUROKHMAN
+  //   [22] Bank Mandiri - «+++-+-8344  ← noise OCR
+  // ══════════════════════════════════════════════
+  if (bank === 'MANDIRI') {
+    const NPWP_RX = /^0{0,2}1061173909|^0010611739093/;
+
+    // ── NAMA PENERIMA: baris setelah label "Penerima"
+    for (let i = 0; i < lines.length; i++) {
+      if (/^Penerima$/i.test(lines[i])) {
+        for (let j = i+1; j < Math.min(i+3, lines.length); j++) {
+          if (/^[A-Z][A-Z\s]{1,40}$/.test(lines[j])) {
+            r.namaPenerima = lines[j].trim();
+            break;
+          }
+        }
+        break;
+      }
+    }
+
+    // ── REKENING TUJUAN & BANK PENERIMA
+    // Pola tepat dari Livin: "Bank Rakyat Indonesia - 368501008969532"
+    // Scan semua baris, cari pola "NamaBank - digit" yang bukan NPWP dan bukan baris Rekening Sumber
+    let pastRekeningSumber = false;
+    for (let i = 0; i < lines.length; i++) {
+      if (/Rekening\s*Sumber/i.test(lines[i])) { pastRekeningSumber = true; }
+      if (pastRekeningSumber) continue; // baris setelah Rekening Sumber = milik pengirim, skip
+
+      const m = lines[i].match(/^(.+?)\s*-\s*(\d{6,20})\s*$/);
+      if (!m) continue;
+      const noRek = m[2].trim();
+      if (NPWP_RX.test(noRek)) continue;
+      const bs = m[1].trim().toUpperCase();
+      // Harus mengandung nama bank yang dikenal
+      if (!/RAKYAT|CENTRAL|NEGARA|MANDIRI|SYARIAH|BSI|BCA|BRI|BNI|CIMB|BTN|DANAMON|PERMATA|MEGA|OCBC|PANIN/i.test(bs)) continue;
+      r.rekTujuan = noRek;
+      if      (/RAKYAT|BRI/.test(bs))        r.bankPenerima = 'BANK BRI';
+      else if (/CENTRAL.?ASIA|BCA/.test(bs)) r.bankPenerima = 'BANK BCA';
+      else if (/NEGARA|BNI/.test(bs))         r.bankPenerima = 'BANK BNI';
+      else if (/\bMANDIRI\b/.test(bs))        r.bankPenerima = 'BANK MANDIRI';
+      else if (/BSI|SYARIAH/.test(bs))        r.bankPenerima = 'BANK BSI';
+      else if (/CIMB/.test(bs))               r.bankPenerima = 'BANK CIMB NIAGA';
+      else if (/DANAMON/.test(bs))            r.bankPenerima = 'BANK DANAMON';
+      else if (/BTN/.test(bs))                r.bankPenerima = 'BANK BTN';
+      else r.bankPenerima = m[1].trim();
+      break;
+    }
+
+    // ── NAMA PENGIRIM & DARI REKENING
+    // Blok "Rekening Sumber":
+    //   NUROKHMAN
+    //   Bank Mandiri - «+++-+-8344   (OCR noise: «+++-+- = titik-titik masked)
+    // Blacklist: angka dari baris "BI Fast XXXX" bukan rekening!
+    // Kumpulkan semua angka yang berasal dari baris BI Fast supaya tidak salah ambil
+    const biFastNums = new Set();
+    for (let i = 0; i < lines.length; i++) {
+      if (/^BI.?Fast/i.test(lines[i])) {
+        const digits = lines[i].replace(/[^0-9]/g, '');
+        if (digits) biFastNums.add(digits);
+      }
+    }
+
+    for (let i = 0; i < lines.length; i++) {
+      if (/Rekening\s*Sumber/i.test(lines[i])) {
+        for (let j = i+1; j < Math.min(i+5, lines.length); j++) {
+          const ln = lines[j].trim();
+          // Nama pengirim = semua huruf kapital
+          if (!r.namaPengirim && /^[A-Z][A-Z\s]{1,40}$/.test(ln)) {
+            r.namaPengirim = ln;
+            continue;
+          }
+          // Dari rekening: baris mengandung "Mandiri" + karakter apapun + digit di akhir
+          if (/Mandiri/i.test(ln)) {
+            // Ambil semua digit dari baris ini
+            const digits = ln.replace(/[^0-9]/g, '');
+            // Pastikan bukan nomor BI Fast
+            if (digits.length >= 4 && !biFastNums.has(digits)) {
+              const last4 = digits.slice(-4);
+              r.dariRek = '\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7' + last4;
+            } else if (digits.length >= 4) {
+              // digits cocok BI Fast — ambil dari raw string, cari digit setelah tanda dash/noise
+              // "Bank Mandiri - «+++-+-8344" → ambil digit terakhir setelah semua noise
+              const afterDash = ln.replace(/^.*?Mandiri\s*[-–]\s*/i, '');
+              const trailingDigits = afterDash.replace(/[^0-9]/g, '');
+              if (trailingDigits.length >= 4) {
+                r.dariRek = '\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7' + trailingDigits.slice(-4);
+              } else {
+                r.dariRek = afterDash.trim() || ln;
+              }
+            } else {
+              r.dariRek = ln.replace(/^.*Mandiri\s*[-\u2013]\s*/i, '').trim();
+            }
+            r.bankPengirim = 'BANK MANDIRI';
+            break;
+          }
+        }
+        break;
+      }
+    }
+
+    // ── BIAYA ADMIN dari "Biaya Transaksi Rp X.XXX"
+    if (!r.admin) {
+      const biayaM = full.match(/Biaya\s*Transaksi\s*Rp\s*([\d.,]+)/i);
+      if (biayaM) r.admin = parseNominalStr(biayaM[1]);
+    }
+
+    // ── NOMINAL dari "Nominal Transfer Rp X"
+    const nomM = full.match(/Nominal\s*Transfer\s*Rp\s*([\d.,]+)/i);
+    if (nomM) r.nominal = parseNominalStr(nomM[1]);
+
+    if (!r.bankPengirim) r.bankPengirim = 'BANK MANDIRI';
+  }
+
   // ── 3. NAMA PENERIMA ──
   // BCA: "Nama Penerima   SUMARNINGSIH"
   // BRI: label "Tujuan" kemudian baris berisi nama (semua kapital), lalu bank, lalu no rek
@@ -1130,13 +1254,13 @@ function parseOCR(text) {
     const npM = full.match(/(?:Penerima|Tujuan|Kepada)\s*[:\-]?\s*([A-Z]{2}[A-Z\s]{1,35})(?=\s+(?:BANK|BCA|BRI|BNI|\d))/i);
     if (npM) namaPenerima = npM[1].trim();
   }
-  if (namaPenerima) r.namaPenerima = namaPenerima.replace(/\s+/g,' ').trim();
+  if (namaPenerima && !r.namaPenerima) r.namaPenerima = namaPenerima.replace(/\s+/g,' ').trim();
 
   // ── 4. REKENING TUJUAN ──
   // BCA: "357 - 129 - 1442" (setelah label "Rekening Tujuan")
   // BRI→BRI: blok "Tujuan" > Nama > BANK BRI > nomor
   // BRI→BNI (BI-FAST): blok "Tujuan" > Nama > BANK BNI > nomor (misal "1282 9626 16")
-  let rekTujuan = extractAfterLabel(lines,
+  let rekTujuan = r.rekTujuan ? r.rekTujuan : extractAfterLabel(lines,
     [/Rekening\s*Tujuan/i, /No\.?\s*Rek(?:ening)?\s*Tujuan/i, /Destination\s*Account/i],
     /([\d][\d\s\-]{5,25}[\d])/
   );
@@ -1156,7 +1280,8 @@ function parseOCR(text) {
       }
     }
     // Fallback: setelah BANK BNI atau BANK BRI (blok tujuan = kemunculan terakhir)
-    if (!rekTujuan) {
+    // tapi SKIP jika Mandiri (rekTujuan sudah diisi dari blok Mandiri)
+    if (!rekTujuan && bank !== 'MANDIRI') {
       const bankTujuanRx = /BANK\s*(BRI|BNI|BCA|MANDIRI)/gi;
       let lastMatch = null, mb;
       while ((mb = bankTujuanRx.exec(full)) !== null) lastMatch = mb;
@@ -1406,7 +1531,31 @@ function parseOCR(text) {
   // Fallback: simpan teks mentah jika ada tapi tidak cocok dengan rules
   if (!jenisMatched && jenisRaw) jenisMatched = jenisRaw;
 
-  if (jenisMatched) r.jenis = jenisMatched.replace(/\s+/g,' ').trim();
+  if (jenisMatched && bank !== 'MANDIRI') r.jenis = jenisMatched.replace(/\s+/g,' ').trim();
+
+  // ── Jenis transaksi Mandiri — ditetapkan di sini (setelah section 5) supaya tidak ditimpa
+  if (bank === 'MANDIRI') {
+    const isBiFastM = /Metode\s*Transfer\s*BI.?\s*Fast/i.test(full);
+    if (isBiFastM) {
+      const bp = (r.bankPenerima || '').toUpperCase();
+      if      (bp.includes('BRI'))     r.jenis = 'Transfer BI-FAST ke BRI';
+      else if (bp.includes('BCA'))     r.jenis = 'Transfer BI-FAST ke BCA';
+      else if (bp.includes('BNI'))     r.jenis = 'Transfer BI-FAST ke BNI';
+      else if (bp.includes('MANDIRI')) r.jenis = 'Transfer Sesama Mandiri';
+      else if (bp.includes('BSI'))     r.jenis = 'Transfer BI-FAST ke BSI';
+      else if (bp.includes('BTN'))     r.jenis = 'Transfer BI-FAST ke BTN';
+      else if (bp.includes('CIMB'))    r.jenis = 'Transfer BI-FAST ke CIMB Niaga';
+      else if (bp.includes('DANAMON')) r.jenis = 'Transfer BI-FAST ke Danamon';
+      else r.jenis = 'Transfer BI-FAST';
+    } else if (!r.jenis) {
+      // Tidak BI Fast — tentukan dari bank penerima
+      const bp = (r.bankPenerima || '').toUpperCase();
+      if (bp.includes('MANDIRI')) r.jenis = 'Transfer Sesama Mandiri';
+      else if (bp.includes('BRI')) r.jenis = 'Transfer ke BRI';
+      else if (bp.includes('BCA')) r.jenis = 'Transfer ke BCA';
+      else if (bp.includes('BNI')) r.jenis = 'Transfer ke BNI';
+    }
+  }
 
   // ── 6. DARI REKENING ──
   // Format BRI: "5870 **** **** 533" / "3685 **** **** 532"
@@ -1414,6 +1563,10 @@ function parseOCR(text) {
   // OCR noise berat  : "3685 111 +e S3D"  ← awal 4 digit, akhir ada digit, tengah noise
   // Format BCA: "159 - 0** - **06"
   // Strategi: 4 lapis — label eksplisit → blok Sumber Dana → scan seluruh teks → fallback angka
+  // MANDIRI: sudah diisi di blok khusus di atas — skip parsing umum
+  if (bank === 'MANDIRI') {
+    // dariRek sudah diisi di blok Mandiri, lompat ke bagian 7
+  } else {
 
   // Pre-extract No. Ref digits sekarang (parsing lengkap di bagian 7)
   // supaya bisa di-blacklist saat cari dariRek
@@ -1431,8 +1584,15 @@ function parseOCR(text) {
   })();
 
   const noRefDigits     = _noRefEarly;
+  // Juga blacklist semua angka dari baris "BI Fast XXXX" (no ref BI Fast dari Mandiri Livin)
+  const biFastRefDigits = new Set();
+  for (const ln of lines) {
+    if (/^BI.?Fast\s+\d/i.test(ln)) {
+      biFastRefDigits.add(ln.replace(/[^0-9]/g,''));
+    }
+  }
   const rekTujuanDigits = (r.rekTujuan || '').replace(/\D/g,'');
-  const isBlacklisted   = d => d.length > 0 && (d === rekTujuanDigits || d === noRefDigits);
+  const isBlacklisted   = d => d.length > 0 && (d === rekTujuanDigits || d === noRefDigits || biFastRefDigits.has(d));
 
   // Helper: normalisasi baris rekening ber-noise → "XXXX **** **** YYY"
   const rekonstRek = s => {
@@ -1536,6 +1696,8 @@ function parseOCR(text) {
 
   if (dariRek) r.dariRek = dariRek.trim().replace(/\s+/g,' ');
 
+  } // end if (bank !== 'MANDIRI') for dariRek
+
   // ── 6b. BANK PENGIRIM & BANK PENERIMA ──
   // BCA: label "Dari Rekening" / "Jenis Transaksi" mengandung nama bank tujuan
   // BRI: blok "Sumber Dana" → Nama → BANK XXX (pengirim)
@@ -1616,9 +1778,9 @@ function parseOCR(text) {
     }
   }
 
-  if (namaPengirim) r.namaPengirim = namaPengirim;
-  if (bankPengirim) r.bankPengirim = bankPengirim;
-  if (bankPenerima) r.bankPenerima = bankPenerima;
+  if (namaPengirim && !r.namaPengirim) r.namaPengirim = namaPengirim;
+  if (bankPengirim && !r.bankPengirim) r.bankPengirim = bankPengirim;
+  if (bankPenerima && !r.bankPenerima) r.bankPenerima = bankPenerima;
 
 
   // BCA: "AC33B762-7923-40 2B-B930-359F7B1E B762" (bisa multiline / spasi)
@@ -1629,9 +1791,11 @@ function parseOCR(text) {
       // Sisa baris setelah label
       const after = lines[i].replace(/No\.?\s*Ref(?:erensi)?|Reference\s*No|Ref\.?\s*No/i,'').replace(/[:\-]/,'').trim();
       if (after && /[A-Z0-9]{4}/i.test(after)) { noRef = after; break; }
-      // Baris berikut
+      // Baris berikut — untuk Mandiri, ambil HANYA satu baris (baris kedua = BI Fast ref, skip)
       if (i+1 < lines.length) {
         const nxt = lines[i+1].trim();
+        // Skip baris yang dimulai dengan "BI" (BI Fast ref number dari Mandiri Livin)
+        if (/^BI\b/i.test(nxt)) break;
         if (/[A-Z0-9\-]{6,}/i.test(nxt)) { noRef = nxt; break; }
       }
     }
