@@ -150,7 +150,7 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   padding: 7px 16px;
-  border-bottom: 1px dashed #ccc;
+  border-bottom: none;
   gap: 8px;
   font-size: 13px;
 }
@@ -544,6 +544,14 @@ body {
                 <option value="Transfer ke Bank Saqu (Jago)">Transfer ke Bank Saqu</option>
               </optgroup>
 
+              <optgroup label="🏧 Virtual Account (VA)">
+                <option value="Bayar Virtual Account BRIVA">Bayar Virtual Account BRIVA</option>
+                <option value="Bayar Virtual Account Mandiri">Bayar Virtual Account Mandiri</option>
+                <option value="Bayar Virtual Account BCA">Bayar Virtual Account BCA</option>
+                <option value="Bayar Virtual Account BNI">Bayar Virtual Account BNI</option>
+                <option value="Bayar Virtual Account">Bayar Virtual Account (Lainnya)</option>
+              </optgroup>
+
               <optgroup label="⚡ BI-FAST">
                 <option value="Transfer BI-FAST ke BRI">BI-FAST ke BRI</option>
                 <option value="Transfer BI-FAST ke BCA">BI-FAST ke BCA</option>
@@ -691,6 +699,31 @@ body {
               </optgroup>
             </select>
           </div>
+
+          <div class="field" style="grid-column:1/-1;padding-top:4px;">
+            <label style="font-weight:700;color:#0097a7;">⚡ Detail Token Listrik (khusus PLN Prabayar)</label>
+          </div>
+          <div class="field">
+            <label>No. Meter</label>
+            <input type="text" id="fNoMeter" placeholder="">
+          </div>
+          <div class="field">
+            <label>ID Pelanggan (IDPEL)</label>
+            <input type="text" id="fIdPel" placeholder="">
+          </div>
+          <div class="field">
+            <label>Tarif/Daya</label>
+            <input type="text" id="fTarifDaya" placeholder="mis. R1/1300VA">
+          </div>
+          <div class="field">
+            <label>Jumlah kWh</label>
+            <input type="text" id="fJmlKwh" placeholder="">
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>Kode Token (20 digit)</label>
+            <input type="text" id="fKodeToken" placeholder="0000-0000-0000-0000-0000">
+          </div>
+
           <div class="field">
             <label>Nama Pengirim</label>
             <input type="text" id="fNamaPengirim" placeholder="">
@@ -737,28 +770,52 @@ body {
               <div class="receipt-status" id="rStatus">Transfer Berhasil</div>
               <div class="receipt-datetime" id="rDatetime">—</div>
               <div class="receipt-top-ref" id="rTopRefWrap">No. Ref: <span id="rTopRef">—</span></div>
-              <div class="receipt-amount-wrap">
+              <div class="receipt-amount-wrap" id="wrapNominalTop">
                 <div class="receipt-amount" id="rNominal">IDR 0</div>
+              </div>
+              <!-- Khusus token listrik: kode token tampil di posisi nominal besar -->
+              <div class="receipt-amount-wrap" id="wrapKodeTokenTop" style="display:none;">
+                <div class="receipt-amount" id="rKodeTokenTop" style="font-size:18px;letter-spacing:1px;">—</div>
               </div>
             </div>
 
             <!-- Body rows -->
             <div class="receipt-body">
-              <div class="receipt-row">
-                <span class="rl">Nama Penerima</span>
+              <div class="receipt-row" id="rowNamaPenerima">
+                <span class="rl" id="lblNamaPenerima">Nama Penerima</span>
                 <span class="rv" id="rNamaPenerima">—</span>
               </div>
               <div class="receipt-row" id="rowBankPenerima">
                 <span class="rl">Bank Penerima</span>
                 <span class="rv" id="rBankPenerima">—</span>
               </div>
-              <div class="receipt-row">
+              <div class="receipt-row" id="rowRekTujuan">
                 <span class="rl">Rekening Tujuan</span>
                 <span class="rv" id="rRekTujuan">—</span>
               </div>
               <div class="receipt-row">
                 <span class="rl">Jenis Transaksi</span>
                 <span class="rv" id="rJenis">—</span>
+              </div>
+              <div class="receipt-row" id="rowNoMeter">
+                <span class="rl">No. Meter</span>
+                <span class="rv" id="rNoMeter">—</span>
+              </div>
+              <div class="receipt-row" id="rowIdPel">
+                <span class="rl">ID Pelanggan</span>
+                <span class="rv" id="rIdPel">—</span>
+              </div>
+              <div class="receipt-row" id="rowTarifDaya">
+                <span class="rl">Tarif/Daya</span>
+                <span class="rv" id="rTarifDaya">—</span>
+              </div>
+              <div class="receipt-row" id="rowJmlKwh">
+                <span class="rl">Jumlah kWh</span>
+                <span class="rv" id="rJmlKwh">—</span>
+              </div>
+              <div class="receipt-row" id="rowKodeToken">
+                <span class="rl">Kode Token</span>
+                <span class="rv" id="rKodeToken">—</span>
               </div>
               <div class="receipt-row" id="rowNamaPengirim">
                 <span class="rl">Nama Pengirim</span>
@@ -768,7 +825,7 @@ body {
                 <span class="rl">Bank Pengirim</span>
                 <span class="rv" id="rBankPengirim">—</span>
               </div>
-              <div class="receipt-row">
+              <div class="receipt-row" id="rowDariRek">
                 <span class="rl">Dari Rekening</span>
                 <span class="rv" id="rDariRek">—</span>
               </div>
@@ -848,6 +905,11 @@ const fNamaPengirim = document.getElementById('fNamaPengirim');
 const fNoRef        = document.getElementById('fNoRef');
 const fAdmin        = document.getElementById('fAdmin');
 const fBerita       = document.getElementById('fBerita');
+const fNoMeter      = document.getElementById('fNoMeter');
+const fIdPel        = document.getElementById('fIdPel');
+const fTarifDaya    = document.getElementById('fTarifDaya');
+const fJmlKwh       = document.getElementById('fJmlKwh');
+const fKodeToken    = document.getElementById('fKodeToken');
 const wrapNominal   = document.getElementById('wrapNominal');
 const wrapAdmin     = document.getElementById('wrapAdmin');
 
@@ -863,6 +925,11 @@ const rBankPengirim = document.getElementById('rBankPengirim');
 const rBankPenerima = document.getElementById('rBankPenerima');
 const rNamaPengirim = document.getElementById('rNamaPengirim');
 const rBerita       = document.getElementById('rBerita');
+const rNoMeter      = document.getElementById('rNoMeter');
+const rIdPel        = document.getElementById('rIdPel');
+const rTarifDaya    = document.getElementById('rTarifDaya');
+const rJmlKwh       = document.getElementById('rJmlKwh');
+const rKodeToken    = document.getElementById('rKodeToken');
 const rTopRef       = document.getElementById('rTopRef');
 const rNominalBox   = document.getElementById('rNominalBox');
 const rAdminBox     = document.getElementById('rAdminBox');
@@ -910,15 +977,65 @@ function updateReceipt() {
   document.getElementById('rowBankPengirim').style.display = bp  ? '' : 'none';
   document.getElementById('rowBankPenerima').style.display = bpr ? '' : 'none';
 
+  // Detail Token Listrik — sembunyikan baris jika kosong
+  const nm  = fNoMeter.value.trim();
+  const idp = fIdPel.value.trim();
+  const td  = fTarifDaya.value.trim();
+  const kwh = fJmlKwh.value.trim();
+  const kt  = fKodeToken.value.trim();
+  rNoMeter.textContent   = nm  || '—';
+  rIdPel.textContent     = idp || '—';
+  rTarifDaya.textContent = td  || '—';
+  rJmlKwh.textContent    = kwh ? (kwh + ' kWh') : '—';
+  rKodeToken.textContent = kt  || '—';
+  document.getElementById('rowNoMeter').style.display   = nm  ? '' : 'none';
+  document.getElementById('rowIdPel').style.display     = idp ? '' : 'none';
+  document.getElementById('rowTarifDaya').style.display = td  ? '' : 'none';
+  document.getElementById('rowJmlKwh').style.display    = kwh ? '' : 'none';
+  document.getElementById('rowKodeToken').style.display = kt  ? '' : 'none';
+
   const nom = parseNum(fNominal.value);
   const adm = parseNum(fAdmin.value);
   rNominal.textContent    = idrFmt(String(nom));
   rNominalBox.textContent = idrFmt(String(nom));
   rAdminBox.textContent   = idrFmt(String(adm));
   rTotalBox.textContent   = idrFmt(String(nom + adm));
+
+  // ── Khusus Token Listrik ──
+  const isToken = fJenis.value === 'Bayar Listrik PLN Prabayar (Token)';
+  const wrapNominalTop   = document.getElementById('wrapNominalTop');
+  const wrapKodeTokenTop = document.getElementById('wrapKodeTokenTop');
+  const rKodeTokenTop    = document.getElementById('rKodeTokenTop');
+  const lblNama          = document.getElementById('lblNamaPenerima');
+
+  if (isToken) {
+    // Tukar: sembunyikan nominal besar, tampilkan kode token di tempatnya
+    wrapNominalTop.style.display   = 'none';
+    wrapKodeTokenTop.style.display = '';
+    rKodeTokenTop.textContent      = kt || '—';
+    // Ganti label Nama Penerima → Nama
+    if (lblNama) lblNama.textContent = 'Nama';
+    // Sembunyikan Rekening Tujuan, Dari Rekening, Berita
+    document.getElementById('rowRekTujuan').style.display = 'none';
+    document.getElementById('rowDariRek').style.display   = 'none';
+    document.getElementById('rowBerita').style.display    = 'none';
+  } else {
+    // Tampilkan kembali nominal besar, sembunyikan kode token di top
+    wrapNominalTop.style.display   = '';
+    wrapKodeTokenTop.style.display = 'none';
+    // Kembalikan label
+    if (lblNama) lblNama.textContent = 'Nama Penerima';
+    // Tampilkan baris yang tadi disembunyikan (sesuai isi)
+    const rek = fRekTujuan.value.trim();
+    const dr  = fDariRek.value.trim();
+    const br  = fBerita.value.trim();
+    document.getElementById('rowRekTujuan').style.display = rek ? '' : 'none';
+    document.getElementById('rowDariRek').style.display   = dr  ? '' : 'none';
+    document.getElementById('rowBerita').style.display    = br  ? '' : 'none';
+  }
 }
 
-[fNamaAgen,fStatus,fDatetime,fNamaPenerima,fRekTujuan,fNamaPengirim,fBankPengirim,fBankPenerima,fDariRek,fNoRef,fBerita]
+[fNamaAgen,fStatus,fDatetime,fNamaPenerima,fRekTujuan,fNamaPengirim,fBankPengirim,fBankPenerima,fDariRek,fNoRef,fBerita,fNoMeter,fIdPel,fTarifDaya,fJmlKwh,fKodeToken]
   .forEach(el => el.addEventListener('input', updateReceipt));
 
 // fJenis adalah <select> — gunakan 'change'
@@ -988,6 +1105,11 @@ function resetForm() {
   fNoRef.value        = '';
   fBerita.value       = '';
   fAdmin.value        = '';
+  fNoMeter.value      = '';
+  fIdPel.value        = '';
+  fTarifDaya.value    = '';
+  fJmlKwh.value       = '';
+  fKodeToken.value    = '';
 
   // Reset select jenis transaksi
   fJenis.value = '';
@@ -1068,7 +1190,7 @@ function parseOCR(text) {
   const full  = lines.join(' ');
   const bank  = detectBank(full);
   const isWondr = /WONDR/i.test(full);
-  const r = { datetime:'', nominal:0, admin:0, namaPenerima:'', rekTujuan:'', jenis:'', namaPengirim:'', dariRek:'', bankPengirim:'', bankPenerima:'', noRef:'', berita:'' };
+  const r = { datetime:'', nominal:0, admin:0, namaPenerima:'', rekTujuan:'', jenis:'', namaPengirim:'', dariRek:'', bankPengirim:'', bankPenerima:'', noRef:'', berita:'', noMeter:'', idPel:'', tarifDaya:'', jmlKwh:'', kodeToken:'' };
 
   // ── 1. DATETIME ──
   // Format BCA: "23 Jun 2026 12:53:02"
@@ -1081,7 +1203,9 @@ function parseOCR(text) {
     `(\\d{1,2}\\s+(?:${bulanAll})\\s+\\d{4}(?:[,\\s\\u2022\\u00b7\\-]+\\d{1,2}:\\d{2}(?::\\d{2})?(?:\\s*WIB|WIT|WITA)?)?)`,
     'i'
   );
-  const dtm = full.match(dtmRx) || full.match(/\d{4}-\d{2}-\d{2}\s+\d{1,2}:\d{2}/);
+  const dtm = full.match(dtmRx)
+    || full.match(/\d{4}-\d{2}-\d{2}\s+\d{1,2}:\d{2}/)
+    || full.match(/\d{2}-\d{2}-\d{4}\s+\d{1,2}:\d{2}(?::\d{2})?(?:\s*WIB|WIT|WITA)?/i);
   if (dtm) r.datetime = dtm[1] || dtm[0];
 
   // ── 2. NOMINAL & BIAYA ADMIN ──
@@ -1328,6 +1452,66 @@ function parseOCR(text) {
     if (biayaWondr) r.admin = parseNominalStr(biayaWondr[1]);
   }
 
+  // ══════════════════════════════════════════════
+  // STRUK PEMBELIAN LISTRIK PRABAYAR (TOKEN PLN) — mis. BRILink mobile, Livin, dll
+  // Layout OCR-nya (bisa dari agen bank mana pun, deteksi berdasar isi bukan nama bank):
+  //   Kode Token
+  //   3589-8231-7768-6619-7091
+  //   ID Transaksi
+  //   529968861366
+  //   STRUK PEMBELIAN LISTRIK PRABAYAR
+  //   NO METER / IDPEL / NAMA / TARIF/DAYA / NO REF
+  //   RP BAYAR / METERAI / PPn / PBJT-TL / ANGSURAN
+  //   RP STROOM/TOKEN / JML KWH / STROOM/TOKEN / ADMIN BANK
+  // ══════════════════════════════════════════════
+  const isToken = /STRUK\s*PEMBELIAN\s*LISTRIK|KODE\s*TOKEN|RP\s*STROOM\s*\/?\s*TOKEN|JML\s*KWH/i.test(full);
+  if (isToken) {
+    // Label & nilai bisa sebaris ("NO METER 50013823831") ATAU label sendirian lalu
+    // nilainya di baris berikutnya — extractAfterLabel menangani keduanya selama
+    // pola labelnya TIDAK di-anchor dengan "$" (supaya tetap cocok walau ada teks sesudahnya)
+    r.noMeter   = extractAfterLabel(lines, [/^NO\.?\s*METER\b/i], /(\d{6,20})/);
+    r.idPel     = extractAfterLabel(lines, [/^IDPEL\b|^ID\s*PEL(?:ANGGAN)?\b/i], /(\d{6,20})/);
+    r.tarifDaya = extractAfterLabel(lines, [/^TARIF\s*\/?\s*DAYA\b/i], /([A-Z0-9\/]{2,15})/);
+    r.jmlKwh    = extractAfterLabel(lines, [/^JML\s*KWH\b|^JUMLAH\s*KWH\b/i], /([\d.,]+)/);
+
+    // Nama pelanggan PLN → dipetakan ke field "Nama Penerima" yang sudah ada.
+    // Sering ke-wrap OCR jadi 2 baris, mis. "NAMA BONDAN GAYUH" + "ALMUAZAM" di baris berikutnya
+    let namaPln = '';
+    for (let i = 0; i < lines.length; i++) {
+      const m = lines[i].match(/^NAMA\b\s*(.*)$/i);
+      if (m) {
+        let val = m[1].trim();
+        const nxt = lines[i+1]?.trim() || '';
+        const isLanjutanNama = nxt && /^[A-Z][A-Z'.]*$/.test(nxt) &&
+          !/^(TARIF|NO|IDPEL|JML|ADMIN|RP|STRUK|PBJT|ANGSURAN|METERAI|PPN)/i.test(nxt);
+        if (val && isLanjutanNama) val = (val + ' ' + nxt).trim();
+        else if (!val && nxt) val = nxt;
+        namaPln = val;
+        break;
+      }
+    }
+    if (namaPln) r.namaPenerima = namaPln;
+
+    // Kode Token: 20 digit format "XXXX-XXXX-XXXX-XXXX-XXXX" (boleh pakai spasi/strip)
+    const tokenM = full.match(/(\d{4}[\s\-]\d{4}[\s\-]\d{4}[\s\-]\d{4}[\s\-]\d{4})/);
+    if (tokenM) r.kodeToken = tokenM[1].replace(/[\s\-]+/g,'-');
+
+    // Admin Bank — label khas struk token, bukan "Biaya Admin"
+    const admM = full.match(/ADMIN\s*BANK\s*(?:Rp|IDR)\.?\s*([\d.,]+)/i);
+    if (admM) r.admin = parseNominalStr(admM[1]);
+
+    // Nominal: jumlah Rp pertama yang berdiri sendiri (baris sebelum label "Kode Token")
+    for (let i = 0; i < lines.length; i++) {
+      if (/Kode\s*Token/i.test(lines[i])) break;
+      const mnom = lines[i].match(/^(?:Rp|IDR)\.?\s*([\d.,]+)$/i);
+      if (mnom) { r.nominal = parseNominalStr(mnom[1]); break; }
+    }
+
+    // Bank Pengirim/Penerima tidak relevan untuk pembelian token — kosongkan supaya tidak salah isi
+    r.bankPenerima = '';
+    r.rekTujuan = r.idPel || r.noMeter || '';
+  }
+
   // ── 3. NAMA PENERIMA ──
   // BCA: "Nama Penerima   SUMARNINGSIH"
   // BRI: label "Tujuan" kemudian baris berisi nama (semua kapital), lalu bank, lalu no rek
@@ -1337,12 +1521,14 @@ function parseOCR(text) {
   );
 
   if (!namaPenerima && bank === 'BRI') {
-    // BRI: cari pola "Tujuan" → baris berikut nama kapital
+    // BRI: cari pola "Tujuan" → baris berikut nama (huruf besar semua ATAU huruf campuran,
+    // mis. transfer biasa "CUANDI PRATAMA" atau Virtual Account/BRIVA "PU Indri apriani")
     for (let i = 0; i < lines.length; i++) {
       if (/^Tujuan$/i.test(lines[i])) {
         for (let j = i+1; j < Math.min(i+4, lines.length); j++) {
-          if (/^[A-Z][A-Z\s]{2,}$/.test(lines[j])) {
-            namaPenerima = lines[j].trim();
+          const cand = lines[j].trim();
+          if (/^[A-Za-z][A-Za-z.,'\s]{2,40}$/.test(cand) && !/^(BANK|PT\s|CV\s)/i.test(cand)) {
+            namaPenerima = cand;
             break;
           }
         }
@@ -1416,6 +1602,14 @@ function parseOCR(text) {
 
   // Daftar aturan: [regex_matcher, nilai_option_di_dropdown]
   const jenisRules = [
+    // ── Virtual Account (VA) — dicek PALING AWAL supaya label "Jenis Transaksi: Pembayaran
+    // BRIVA" tertangkap lebih dulu sebelum sempat nyasar ke aturan lain
+    [/BRIVA|\bBRI\s*VA\b/i,                            'Bayar Virtual Account BRIVA'],
+    [/MANDIRI\s*VIRTUAL\s*ACCOUNT|\bMANDIRI\s*VA\b/i,  'Bayar Virtual Account Mandiri'],
+    [/\bBCA\s*VIRTUAL\s*ACCOUNT\b|\bBCA\s*VA\b/i,      'Bayar Virtual Account BCA'],
+    [/BNIVA|\bBNI\s*VIRTUAL\s*ACCOUNT\b|\bBNI\s*VA\b/i,'Bayar Virtual Account BNI'],
+    [/VIRTUAL\s*ACCOUNT|\bVA\s*NUMBER\b/i,             'Bayar Virtual Account'],
+
     // ── BI-FAST spesifik (cek duluan supaya tidak tertangkap "Transfer ke X" biasa)
     [/BI.?FAST.*BRI|BRI.*BI.?FAST/i,           'Transfer BI-FAST ke BRI'],
     [/BI.?FAST.*BCA|BCA.*BI.?FAST/i,           'Transfer BI-FAST ke BCA'],
@@ -1541,7 +1735,7 @@ function parseOCR(text) {
     // ── E-Wallet
     [/GOPAY/i,      'Isi Ulang GoPay'],
     [/\bOVO\b/i,    'Isi Ulang OVO'],
-    [/\bDANA\b/i,   'Isi Ulang DANA'],
+    [/\bDANA\b(?<!SUMBER DANA)/i,   'Isi Ulang DANA'],
     [/SHOPEEPAY|SHOPEE\s*PAY/i, 'Isi Ulang ShopeePay'],
     [/LINKAJA|LINK\s*AJA/i,     'Isi Ulang LinkAja'],
     [/SAKUKU/i,     'Isi Ulang Sakuku (BCA)'],
@@ -1666,7 +1860,7 @@ function parseOCR(text) {
   // Format BCA: "159 - 0** - **06"
   // Strategi: 4 lapis — label eksplisit → blok Sumber Dana → scan seluruh teks → fallback angka
   // MANDIRI & WONDR: sudah diisi di blok khusus di atas — skip parsing umum
-  if (bank === 'MANDIRI' || isWondr) {
+  if (bank === 'MANDIRI' || isWondr || isToken) {
     // dariRek sudah diisi di blok khusus, lompat ke bagian 7
   } else {
 
@@ -1902,13 +2096,33 @@ function parseOCR(text) {
     if (/No\.?\s*Ref(?:erensi)?|Reference\s*No|Ref\.?\s*No|Ref\s*ID/i.test(lines[i])) {
       // Sisa baris setelah label
       const after = lines[i].replace(/No\.?\s*Ref(?:erensi)?|Reference\s*No|Ref\.?\s*No|Ref\s*ID/i,'').replace(/[:\-]/,'').trim();
-      if (after && /[A-Z0-9]{4}/i.test(after)) { noRef = after; break; }
+      if (after && /[A-Z0-9]{4}/i.test(after)) {
+        noRef = after;
+        // Cek kemungkinan sambungan baris — referensi panjang yang wrap ke baris berikutnya
+        // (mis. struk token listrik BRILink: "NO REF 200217CE8B1421B017401" + "4B4DB0CB0BC")
+        const nxtWrap = lines[i+1]?.trim();
+        if (nxtWrap && /^[A-Z0-9]{3,20}$/i.test(nxtWrap) &&
+            !/^(BI|RP|NO|ID|NAMA|TARIF|JML|ADMIN|STRUK|PBJT)/i.test(nxtWrap)) {
+          noRef += nxtWrap;
+        }
+        break;
+      }
       // Baris berikut — untuk Mandiri, ambil HANYA satu baris (baris kedua = BI Fast ref, skip)
       if (i+1 < lines.length) {
         const nxt = lines[i+1].trim();
         // Skip baris yang dimulai dengan "BI" (BI Fast ref number dari Mandiri Livin)
         if (/^BI\b/i.test(nxt)) break;
-        if (/[A-Z0-9\-]{6,}/i.test(nxt)) { noRef = nxt; break; }
+        if (/[A-Z0-9\-]{6,}/i.test(nxt)) {
+          noRef = nxt;
+          // Cek kemungkinan sambungan baris — referensi panjang yang wrap ke baris berikutnya
+          // (mis. struk token listrik BRILink: "200217CE8B1421B017401" + "4B4DB0CB0BC")
+          const after2 = lines[i+2]?.trim();
+          if (after2 && /^[A-Z0-9]{3,20}$/i.test(after2) &&
+              !/^(BI|RP|NO|ID|NAMA|TARIF|JML|ADMIN|STRUK|PBJT)/i.test(after2)) {
+            noRef += after2;
+          }
+          break;
+        }
       }
     }
   }
@@ -1929,7 +2143,7 @@ function parseOCR(text) {
   // BCA: "Berita" → satu baris
   let berita = '';
   const labelBerita = /^(?:Berita|Keterangan|Catatan|Note)$/i;
-  const stopBerita  = /^(?:Nominal|Biaya|Total|No\.|Dari|Rekening|Alias|Jenis|Sumber|Tujuan|INFORMASI)/i;
+  const stopBerita  = /^(?:Nominal|Biaya|Total|No\.|Dari|Rekening|Alias|Jenis|Sumber|Tujuan|INFORMASI|Catatan|Keterangan|Berita|Note)/i;
 
   for (let i = 0; i < lines.length; i++) {
     // Label saja di satu baris (BRI: "Catatan", BCA: "Berita")
@@ -2042,6 +2256,11 @@ scanBtn.addEventListener('click', async ()=>{
     if(d.bankPenerima) { fBankPenerima.value  = d.bankPenerima;                       markFilled(fBankPenerima);          filled++; }
     if(d.noRef)        { fNoRef.value       = d.noRef;                              markFilled(fNoRef);                filled++; }
     if(d.berita)       { fBerita.value      = d.berita;                             markFilled(fBerita);               filled++; }
+    if(d.noMeter)      { fNoMeter.value     = d.noMeter;                            markFilled(fNoMeter);              filled++; }
+    if(d.idPel)        { fIdPel.value       = d.idPel;                              markFilled(fIdPel);                filled++; }
+    if(d.tarifDaya)    { fTarifDaya.value   = d.tarifDaya;                          markFilled(fTarifDaya);            filled++; }
+    if(d.jmlKwh)       { fJmlKwh.value      = d.jmlKwh;                             markFilled(fJmlKwh);               filled++; }
+    if(d.kodeToken)    { fKodeToken.value   = d.kodeToken;                          markFilled(fKodeToken);            filled++; }
 
     updateReceipt();
     progressWrap.classList.remove('show');
