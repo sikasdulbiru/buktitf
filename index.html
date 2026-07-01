@@ -742,32 +742,38 @@ body {
           </div>
         </div>
 
+        <!-- Hidden inputs untuk data token/pasca — selalu ada di DOM, tidak terpengaruh display:none -->
+        <input type="hidden" id="fKodeToken" value="">
+        <input type="hidden" id="fNoMeter" value="">
+        <input type="hidden" id="fIdPel" value="">
+        <input type="hidden" id="fTarifDaya" value="">
+        <input type="hidden" id="fJmlKwh" value="">
+
         <!-- TAB: TOKEN LISTRIK -->
         <div id="sectionToken" class="fields-grid" style="margin-top:12px;display:none;">
           <div class="field">
             <label>Nama Pelanggan</label>
-            <input type="text" id="fNamaPenerima" placeholder="" style="display:none;">
-            <input type="text" id="fNamaPelangganToken" placeholder="">
+            <input type="text" id="fNamaPelangganToken" placeholder="" oninput="updateReceipt()">
           </div>
           <div class="field">
             <label>No. Meter</label>
-            <input type="text" id="fNoMeter" placeholder="">
+            <input type="text" id="vNoMeter" placeholder="" oninput="syncHidden('fNoMeter',this.value)">
           </div>
           <div class="field">
             <label>ID Pelanggan (IDPEL)</label>
-            <input type="text" id="fIdPel" placeholder="">
+            <input type="text" id="vIdPel" placeholder="" oninput="syncHidden('fIdPel',this.value)">
           </div>
           <div class="field">
             <label>Tarif/Daya</label>
-            <input type="text" id="fTarifDaya" placeholder="mis. R1/1300VA">
+            <input type="text" id="vTarifDaya" placeholder="mis. R1/1300VA" oninput="syncHidden('fTarifDaya',this.value)">
           </div>
           <div class="field">
             <label>Jumlah kWh</label>
-            <input type="text" id="fJmlKwh" placeholder="">
+            <input type="text" id="vJmlKwh" placeholder="" oninput="syncHidden('fJmlKwh',this.value)">
           </div>
           <div class="field" style="grid-column:1/-1">
             <label>Kode Token (20 digit)</label>
-            <input type="text" id="fKodeToken" placeholder="0000-0000-0000-0000-0000">
+            <input type="text" id="vKodeToken" placeholder="0000-0000-0000-0000-0000" oninput="syncHidden('fKodeToken',this.value)">
           </div>
         </div>
 
@@ -990,8 +996,8 @@ function switchTab(tab) {
   ['transfer','token','pasca'].forEach(t => {
     const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
     const active = t === tab;
-    btn.style.color       = active ? '#0097a7' : '#999';
-    btn.style.fontWeight  = active ? '700' : '600';
+    btn.style.color        = active ? '#0097a7' : '#999';
+    btn.style.fontWeight   = active ? '700' : '600';
     btn.style.borderBottom = active ? '2px solid #0097a7' : '2px solid transparent';
   });
   // Set jenis transaksi otomatis
@@ -1000,6 +1006,13 @@ function switchTab(tab) {
   } else if (tab === 'pasca') {
     fJenis.value = 'Bayar Listrik PLN Pascabayar';
   }
+  // Reset label-label dinamis baris struk ke default
+  const lblIdPel     = document.querySelector('#rowIdPel .rl');
+  const lblJmlKwh    = document.querySelector('#rowJmlKwh .rl');
+  const lblKodeToken = document.querySelector('#rowKodeToken .rl');
+  if (lblIdPel)     lblIdPel.textContent     = 'ID Pelanggan';
+  if (lblJmlKwh)    lblJmlKwh.textContent    = 'Jumlah kWh';
+  if (lblKodeToken) lblKodeToken.textContent = 'Kode Token';
   updateReceipt();
 }
 
@@ -1021,6 +1034,11 @@ function setStatus(t,m) {
 function markFilled(el,wrap) {
   el.classList.add('auto-filled');
   if(wrap) wrap.classList.add('auto-filled');
+}
+function syncHidden(id, val) {
+  const h = document.getElementById(id);
+  if (h) h.value = val;
+  updateReceipt();
 }
 
 function updateReceipt() {
@@ -1150,7 +1168,7 @@ function updateReceipt() {
   }
 }
 
-[fNamaAgen,fStatus,fDatetime,fNominal,fNamaPenerima,fRekTujuan,fNamaPengirim,fBankPengirim,fBankPenerima,fDariRek,fNoRef,fBerita,fNoMeter,fIdPel,fTarifDaya,fJmlKwh,fKodeToken,fAdmin]
+[fNamaAgen,fStatus,fDatetime,fNominal,fNamaPenerima,fRekTujuan,fNamaPengirim,fBankPengirim,fBankPenerima,fDariRek,fNoRef,fBerita,fAdmin]
   .forEach(el => { if(el) el.addEventListener('input', updateReceipt); });
 
 // Field tab token & pasca
@@ -1231,6 +1249,10 @@ function resetForm() {
   fTarifDaya.value    = '';
   fJmlKwh.value       = '';
   fKodeToken.value    = '';
+  // Reset visual inputs token
+  ['vNoMeter','vIdPel','vTarifDaya','vJmlKwh','vKodeToken','fNamaPelangganToken','fNamaPelangganPasca','fIdPelPasca','fTarifDayaPasca','fBulanPasca','fJmlKwhPasca'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
 
   // Reset select jenis transaksi
   fJenis.value = '';
@@ -1613,9 +1635,25 @@ function parseOCR(text) {
     }
     if (namaPln) r.namaPenerima = namaPln;
 
-    // Kode Token: 20 digit format "XXXX-XXXX-XXXX-XXXX-XXXX" (boleh pakai spasi/strip)
-    const tokenM = full.match(/(\d{4}[\s\-]\d{4}[\s\-]\d{4}[\s\-]\d{4}[\s\-]\d{4})/);
-    if (tokenM) r.kodeToken = tokenM[1].replace(/[\s\-]+/g,'-');
+    // Kode Token: 20 digit, pemisah bisa strip/spasi/titik, ada kemungkinan suffix noise (DU, dll)
+    // Cari dulu dari label STROOM/TOKEN, kalau tidak ada cari pola 20-digit langsung
+    let kodeTokenFound = '';
+    const stroomM = full.match(/STROOM\s*\/?\s*TOKEN\s+([\d][\d\s\-\.]{17,23}[\d])/i);
+    if (stroomM) {
+      kodeTokenFound = stroomM[1].replace(/[\s\-\.]+/g,'-').replace(/-+/g,'-');
+      // Pastikan 20 digit (5 grup x 4)
+      const digits = kodeTokenFound.replace(/-/g,'');
+      if (digits.length === 20) r.kodeToken = kodeTokenFound;
+    }
+    if (!r.kodeToken) {
+      // Fallback: cari pola 20 digit dengan berbagai pemisah
+      const tokenM = full.match(/(\d{4}[\s\-\.]?\d{4}[\s\-\.]?\d{4}[\s\-\.]?\d{4}[\s\-\.]?\d{4})(?:\s*[A-Z]{0,3}\b)?/);
+      if (tokenM) {
+        const raw = tokenM[1].replace(/[\s\-\.]+/g,'-');
+        const digits = raw.replace(/-/g,'');
+        if (digits.length === 20) r.kodeToken = raw;
+      }
+    }
 
     // Admin Bank — label khas struk token, bukan "Biaya Admin"
     const admM = full.match(/ADMIN\s*BANK\s*(?:Rp|IDR)\.?\s*([\d.,]+)/i);
@@ -2355,13 +2393,11 @@ scanBtn.addEventListener('click', async ()=>{
     if(d.namaPenerima) { fNamaPenerima.value= d.namaPenerima;                       markFilled(fNamaPenerima);         filled++; }
     if(d.rekTujuan)    { fRekTujuan.value   = d.rekTujuan;                          markFilled(fRekTujuan);            filled++; }
     if(d.jenis) {
-      // Coba cocokkan nilai yang sudah di-map ke opsi dropdown yang ada
       const allOptions = Array.from(fJenis.options);
       const match = allOptions.find(o => o.value === d.jenis);
       if (match) {
         fJenis.value = d.jenis;
       } else {
-        // Tidak ada di daftar — tambahkan sebagai opsi baru
         const opt = document.createElement('option');
         opt.value = d.jenis;
         opt.textContent = d.jenis + ' (dari scan)';
@@ -2377,13 +2413,33 @@ scanBtn.addEventListener('click', async ()=>{
     if(d.bankPenerima) { fBankPenerima.value  = d.bankPenerima;                       markFilled(fBankPenerima);          filled++; }
     if(d.noRef)        { fNoRef.value       = d.noRef;                              markFilled(fNoRef);                filled++; }
     if(d.berita)       { fBerita.value      = d.berita;                             markFilled(fBerita);               filled++; }
-    if(d.noMeter)      { fNoMeter.value     = d.noMeter;                            markFilled(fNoMeter);              filled++; }
-    if(d.idPel)        { fIdPel.value       = d.idPel;                              markFilled(fIdPel);                filled++; }
-    if(d.tarifDaya)    { fTarifDaya.value   = d.tarifDaya;                          markFilled(fTarifDaya);            filled++; }
-    if(d.jmlKwh)       { fJmlKwh.value      = d.jmlKwh;                             markFilled(fJmlKwh);               filled++; }
-    if(d.kodeToken)    { fKodeToken.value   = d.kodeToken;                          markFilled(fKodeToken);            filled++; }
+    if(d.noMeter)      { fNoMeter.value     = d.noMeter;                            markFilled(fNoMeter);              filled++;
+                         const v = document.getElementById('vNoMeter'); if(v){ v.value=d.noMeter; markFilled(v); } }
+    if(d.idPel)        { fIdPel.value       = d.idPel;                              markFilled(fIdPel);                filled++;
+                         const v = document.getElementById('vIdPel'); if(v){ v.value=d.idPel; markFilled(v); } }
+    if(d.tarifDaya)    { fTarifDaya.value   = d.tarifDaya;                          markFilled(fTarifDaya);            filled++;
+                         const v = document.getElementById('vTarifDaya'); if(v){ v.value=d.tarifDaya; markFilled(v); } }
+    if(d.jmlKwh)       { fJmlKwh.value      = d.jmlKwh;                             markFilled(fJmlKwh);               filled++;
+                         const v = document.getElementById('vJmlKwh'); if(v){ v.value=d.jmlKwh; markFilled(v); } }
+    if(d.kodeToken)    { fKodeToken.value   = d.kodeToken;                          markFilled(fKodeToken);            filled++;
+                         const v = document.getElementById('vKodeToken'); if(v){ v.value=d.kodeToken; markFilled(v); } }
+
+    // Sinkron field token ke fNamaPelangganToken jika ada nama penerima & jenis token
+    const isTokenJenis = fJenis.value === 'Bayar Listrik PLN Prabayar (Token)';
+    const isPascaJenis = fJenis.value === 'Bayar Listrik PLN Pascabayar';
+    if (isTokenJenis) {
+      const fNPT = document.getElementById('fNamaPelangganToken');
+      if (fNPT && d.namaPenerima) { fNPT.value = d.namaPenerima; markFilled(fNPT); }
+      switchTab('token');
+    } else if (isPascaJenis) {
+      const fNPP = document.getElementById('fNamaPelangganPasca');
+      if (fNPP && d.namaPenerima) { fNPP.value = d.namaPenerima; markFilled(fNPP); }
+      switchTab('pasca');
+    }
 
     updateReceipt();
+    // Force re-render setelah browser selesai proses DOM (penting untuk mobile)
+    setTimeout(() => updateReceipt(), 100);
     progressWrap.classList.remove('show');
 
     if(filled===0)
