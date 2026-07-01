@@ -890,7 +890,7 @@ body {
                 <span class="al">Nominal</span>
                 <span class="av" id="rNominalBox">IDR 0</span>
               </div>
-              <div class="receipt-admin-row">
+              <div class="receipt-admin-row" id="rowAdminBox">
                 <span class="al">Biaya Admin</span>
                 <span class="av" id="rAdminBox">IDR 0</span>
               </div>
@@ -1054,6 +1054,7 @@ function updateReceipt() {
   rNominalBox.textContent = idrFmt(String(nom));
   rAdminBox.textContent   = idrFmt(String(adm));
   rTotalBox.textContent   = idrFmt(String(nom + adm));
+  document.getElementById('rowAdminBox').style.display = adm > 0 ? '' : 'none';
 
   const wrapNominalTop   = document.getElementById('wrapNominalTop');
   const wrapKodeTokenTop = document.getElementById('wrapKodeTokenTop');
