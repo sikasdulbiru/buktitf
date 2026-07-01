@@ -428,6 +428,15 @@ body {
 
       <div class="card">
         <h2>✏️ Data Transaksi</h2>
+
+        <!-- TAB BUTTONS -->
+        <div id="tabBar" style="display:flex;gap:8px;margin-bottom:16px;border-bottom:2px solid #e0e0e0;padding-bottom:0;">
+          <button onclick="switchTab('transfer')" id="tabTransfer" style="padding:8px 14px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:700;color:#0097a7;border-bottom:2px solid #0097a7;margin-bottom:-2px;font-family:inherit;">💸 Transfer</button>
+          <button onclick="switchTab('token')" id="tabToken" style="padding:8px 14px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:600;color:#999;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;">⚡ Token Listrik</button>
+          <button onclick="switchTab('pasca')" id="tabPasca" style="padding:8px 14px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:600;color:#999;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;">💡 PLN Pascabayar</button>
+        </div>
+
+        <!-- FIELD BERSAMA (selalu tampil) -->
         <div class="fields-grid">
           <div class="field" style="grid-column:1/-1">
             <label>Nama Agen / Outlet (ganti logo bank)</label>
@@ -449,17 +458,20 @@ body {
             </div>
           </div>
           <div class="field">
-            <label>Nama Penerima</label>
-            <input type="text" id="fNamaPenerima" placeholder="">
+            <label>No. Referensi</label>
+            <input type="text" id="fNoRef" placeholder="">
           </div>
           <div class="field">
-            <label>Bank Penerima</label>
-            <input type="text" id="fBankPenerima" placeholder="">
+            <label>Biaya Admin (IDR)</label>
+            <div class="input-prefix-wrap" id="wrapAdmin">
+              <span>IDR</span>
+              <input type="text" id="fAdmin" placeholder="0" inputmode="numeric">
+            </div>
           </div>
-          <div class="field">
-            <label>Rekening Tujuan</label>
-            <input type="text" id="fRekTujuan" placeholder="">
-          </div>
+        </div>
+
+        <!-- TAB: TRANSFER -->
+        <div id="sectionTransfer" class="fields-grid" style="margin-top:12px;">
           <div class="field" style="grid-column:1/-1">
             <label>Jenis Transaksi</label>
             <select id="fJenis" style="border:1px solid #d5dbd8;border-radius:8px;padding:8px 11px;font-size:13px;outline:none;background:#fff;color:#1a1a1a;font-family:inherit;transition:border-color .15s;width:100%;cursor:pointer;" onfocus="this.style.borderColor='#0097a7'" onblur="this.style.borderColor='#d5dbd8'">
@@ -699,9 +711,43 @@ body {
               </optgroup>
             </select>
           </div>
+          <!-- Field khusus Transfer -->
+          <div class="field">
+            <label>Nama Penerima</label>
+            <input type="text" id="fNamaPenerima" placeholder="">
+          </div>
+          <div class="field">
+            <label>Bank Penerima</label>
+            <input type="text" id="fBankPenerima" placeholder="">
+          </div>
+          <div class="field">
+            <label>Rekening Tujuan</label>
+            <input type="text" id="fRekTujuan" placeholder="">
+          </div>
+          <div class="field">
+            <label>Nama Pengirim</label>
+            <input type="text" id="fNamaPengirim" placeholder="">
+          </div>
+          <div class="field">
+            <label>Bank Pengirim</label>
+            <input type="text" id="fBankPengirim" placeholder="">
+          </div>
+          <div class="field">
+            <label>Dari Rekening</label>
+            <input type="text" id="fDariRek" placeholder="">
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>Berita / Keterangan</label>
+            <input type="text" id="fBerita" placeholder="(kosong)">
+          </div>
+        </div>
 
-          <div class="field" style="grid-column:1/-1;padding-top:4px;">
-            <label style="font-weight:700;color:#0097a7;">⚡ Detail Token Listrik (khusus PLN Prabayar)</label>
+        <!-- TAB: TOKEN LISTRIK -->
+        <div id="sectionToken" class="fields-grid" style="margin-top:12px;display:none;">
+          <div class="field">
+            <label>Nama Pelanggan</label>
+            <input type="text" id="fNamaPenerima" placeholder="" style="display:none;">
+            <input type="text" id="fNamaPelangganToken" placeholder="">
           </div>
           <div class="field">
             <label>No. Meter</label>
@@ -723,35 +769,32 @@ body {
             <label>Kode Token (20 digit)</label>
             <input type="text" id="fKodeToken" placeholder="0000-0000-0000-0000-0000">
           </div>
+        </div>
 
+        <!-- TAB: PLN PASCABAYAR -->
+        <div id="sectionPasca" class="fields-grid" style="margin-top:12px;display:none;">
           <div class="field">
-            <label>Nama Pengirim</label>
-            <input type="text" id="fNamaPengirim" placeholder="">
-          </div>
-          <div class="field">
-            <label>Bank Pengirim</label>
-            <input type="text" id="fBankPengirim" placeholder="">
+            <label>Nama Pelanggan</label>
+            <input type="text" id="fNamaPelangganPasca" placeholder="">
           </div>
           <div class="field">
-            <label>Dari Rekening</label>
-            <input type="text" id="fDariRek" placeholder="">
-          </div>
-          <div class="field" style="grid-column:1/-1">
-            <label>Berita / Keterangan</label>
-            <input type="text" id="fBerita" placeholder="(kosong)">
-          </div>
-          <div class="field" style="grid-column:1/-1">
-            <label>No. Referensi</label>
-            <input type="text" id="fNoRef" placeholder="">
+            <label>No. Meter / ID Pelanggan</label>
+            <input type="text" id="fIdPelPasca" placeholder="">
           </div>
           <div class="field">
-            <label>Biaya Admin (IDR)</label>
-            <div class="input-prefix-wrap" id="wrapAdmin">
-              <span>IDR</span>
-              <input type="text" id="fAdmin" placeholder="0" inputmode="numeric">
-            </div>
+            <label>Tarif/Daya</label>
+            <input type="text" id="fTarifDayaPasca" placeholder="mis. R1/1300VA">
+          </div>
+          <div class="field">
+            <label>Tagihan Bulan</label>
+            <input type="text" id="fBulanPasca" placeholder="mis. Juni 2026">
+          </div>
+          <div class="field">
+            <label>Jumlah kWh</label>
+            <input type="text" id="fJmlKwhPasca" placeholder="">
           </div>
         </div>
+
       </div>
     </div>
 
@@ -935,6 +978,31 @@ const rNominalBox   = document.getElementById('rNominalBox');
 const rAdminBox     = document.getElementById('rAdminBox');
 const rTotalBox     = document.getElementById('rTotalBox');
 
+// ── TAB SWITCHING ──
+let activeTab = 'transfer';
+function switchTab(tab) {
+  activeTab = tab;
+  // Sections
+  document.getElementById('sectionTransfer').style.display = tab === 'transfer' ? '' : 'none';
+  document.getElementById('sectionToken').style.display    = tab === 'token'    ? '' : 'none';
+  document.getElementById('sectionPasca').style.display    = tab === 'pasca'    ? '' : 'none';
+  // Tab button styles
+  ['transfer','token','pasca'].forEach(t => {
+    const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+    const active = t === tab;
+    btn.style.color       = active ? '#0097a7' : '#999';
+    btn.style.fontWeight  = active ? '700' : '600';
+    btn.style.borderBottom = active ? '2px solid #0097a7' : '2px solid transparent';
+  });
+  // Set jenis transaksi otomatis
+  if (tab === 'token') {
+    fJenis.value = 'Bayar Listrik PLN Prabayar (Token)';
+  } else if (tab === 'pasca') {
+    fJenis.value = 'Bayar Listrik PLN Pascabayar';
+  }
+  updateReceipt();
+}
+
 let imgFile = null;
 
 function idrFmt(n) {
@@ -956,43 +1024,11 @@ function markFilled(el,wrap) {
 }
 
 function updateReceipt() {
-  rNamaAgen.textContent     = fNamaAgen.value.trim()     || 'AGEN LAKU PANDAI';
-  rStatus.textContent       = fStatus.value.trim()       || 'Transfer Berhasil';
-  rDatetime.textContent     = fDatetime.value.trim()     || '—';
-  rNamaPenerima.textContent = fNamaPenerima.value.trim() || '—';
-  rRekTujuan.textContent    = fRekTujuan.value.trim()    || '—';
-  rJenis.textContent        = fJenis.value.trim()        || '—';
-  rDariRek.textContent      = fDariRek.value.trim()      || '—';
-  rBerita.textContent       = fBerita.value.trim()       || '—';
-  rTopRef.textContent = fNoRef.value.trim() || '—';
-
-  // Sembunyikan baris opsional jika kosong
-  const np  = fNamaPengirim.value.trim();
-  const bp  = fBankPengirim.value.trim();
-  const bpr = fBankPenerima.value.trim();
-  rNamaPengirim.textContent = np  || '—';
-  rBankPengirim.textContent = bp  || '—';
-  rBankPenerima.textContent = bpr || '—';
-  document.getElementById('rowNamaPengirim').style.display = np  ? '' : 'none';
-  document.getElementById('rowBankPengirim').style.display = bp  ? '' : 'none';
-  document.getElementById('rowBankPenerima').style.display = bpr ? '' : 'none';
-
-  // Detail Token Listrik — sembunyikan baris jika kosong
-  const nm  = fNoMeter.value.trim();
-  const idp = fIdPel.value.trim();
-  const td  = fTarifDaya.value.trim();
-  const kwh = fJmlKwh.value.trim();
-  const kt  = fKodeToken.value.trim();
-  rNoMeter.textContent   = nm  || '—';
-  rIdPel.textContent     = idp || '—';
-  rTarifDaya.textContent = td  || '—';
-  rJmlKwh.textContent    = kwh ? (kwh + ' kWh') : '—';
-  rKodeToken.textContent = kt  || '—';
-  document.getElementById('rowNoMeter').style.display   = nm  ? '' : 'none';
-  document.getElementById('rowIdPel').style.display     = idp ? '' : 'none';
-  document.getElementById('rowTarifDaya').style.display = td  ? '' : 'none';
-  document.getElementById('rowJmlKwh').style.display    = kwh ? '' : 'none';
-  document.getElementById('rowKodeToken').style.display = kt  ? '' : 'none';
+  rNamaAgen.textContent = fNamaAgen.value.trim() || 'AGEN LAKU PANDAI';
+  rStatus.textContent   = fStatus.value.trim()   || 'Transfer Berhasil';
+  rDatetime.textContent = fDatetime.value.trim()  || '—';
+  rJenis.textContent    = fJenis.value.trim()     || '—';
+  rTopRef.textContent   = fNoRef.value.trim()     || '—';
 
   const nom = parseNum(fNominal.value);
   const adm = parseNum(fAdmin.value);
@@ -1001,42 +1037,127 @@ function updateReceipt() {
   rAdminBox.textContent   = idrFmt(String(adm));
   rTotalBox.textContent   = idrFmt(String(nom + adm));
 
-  // ── Khusus Token Listrik ──
-  const isToken = fJenis.value === 'Bayar Listrik PLN Prabayar (Token)';
   const wrapNominalTop   = document.getElementById('wrapNominalTop');
   const wrapKodeTokenTop = document.getElementById('wrapKodeTokenTop');
   const rKodeTokenTop    = document.getElementById('rKodeTokenTop');
   const lblNama          = document.getElementById('lblNamaPenerima');
 
-  if (isToken) {
-    // Tukar: sembunyikan nominal besar, tampilkan kode token di tempatnya
+  // Sembunyikan semua baris dulu, lalu tampilkan sesuai tab
+  ['rowNamaPenerima','rowBankPenerima','rowRekTujuan','rowNamaPengirim',
+   'rowBankPengirim','rowDariRek','rowBerita','rowNoMeter','rowIdPel',
+   'rowTarifDaya','rowJmlKwh','rowKodeToken'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+
+  if (activeTab === 'transfer') {
+    // ── Transfer ──
+    wrapNominalTop.style.display   = '';
+    wrapKodeTokenTop.style.display = 'none';
+    if (lblNama) lblNama.textContent = 'Nama Penerima';
+
+    const nama = fNamaPenerima.value.trim();
+    const bpr  = fBankPenerima.value.trim();
+    const rek  = fRekTujuan.value.trim();
+    const np   = fNamaPengirim.value.trim();
+    const bp   = fBankPengirim.value.trim();
+    const dr   = fDariRek.value.trim();
+    const br   = fBerita.value.trim();
+
+    rNamaPenerima.textContent = nama || '—';
+    rBankPenerima.textContent = bpr  || '—';
+    rRekTujuan.textContent    = rek  || '—';
+    rNamaPengirim.textContent = np   || '—';
+    rBankPengirim.textContent = bp   || '—';
+    rDariRek.textContent      = dr   || '—';
+    rBerita.textContent       = br   || '—';
+
+    if (nama) document.getElementById('rowNamaPenerima').style.display = '';
+    if (bpr)  document.getElementById('rowBankPenerima').style.display = '';
+    if (rek)  document.getElementById('rowRekTujuan').style.display    = '';
+    if (np)   document.getElementById('rowNamaPengirim').style.display = '';
+    if (bp)   document.getElementById('rowBankPengirim').style.display = '';
+    if (dr)   document.getElementById('rowDariRek').style.display      = '';
+    if (br)   document.getElementById('rowBerita').style.display       = '';
+
+  } else if (activeTab === 'token') {
+    // ── Token Listrik ──
+    const fNPT = document.getElementById('fNamaPelangganToken');
+    const nama = fNPT ? fNPT.value.trim() : '';
+    const nm   = fNoMeter.value.trim();
+    const idp  = fIdPel.value.trim();
+    const td   = fTarifDaya.value.trim();
+    const kwh  = fJmlKwh.value.trim();
+    const kt   = fKodeToken.value.trim();
+
+    // Kode token di atas (gantikan nominal besar)
     wrapNominalTop.style.display   = 'none';
     wrapKodeTokenTop.style.display = '';
     rKodeTokenTop.textContent      = kt || '—';
-    // Ganti label Nama Penerima → Nama
+
     if (lblNama) lblNama.textContent = 'Nama';
-    // Sembunyikan Rekening Tujuan, Dari Rekening, Berita
-    document.getElementById('rowRekTujuan').style.display = 'none';
-    document.getElementById('rowDariRek').style.display   = 'none';
-    document.getElementById('rowBerita').style.display    = 'none';
-  } else {
-    // Tampilkan kembali nominal besar, sembunyikan kode token di top
+    rNamaPenerima.textContent = nama || '—';
+    rNoMeter.textContent      = nm   || '—';
+    rIdPel.textContent        = idp  || '—';
+    rTarifDaya.textContent    = td   || '—';
+    rJmlKwh.textContent       = kwh  ? (kwh + ' kWh') : '—';
+    rKodeToken.textContent    = kt   || '—';
+
+    if (nama) document.getElementById('rowNamaPenerima').style.display = '';
+    if (nm)   document.getElementById('rowNoMeter').style.display      = '';
+    if (idp)  document.getElementById('rowIdPel').style.display        = '';
+    if (td)   document.getElementById('rowTarifDaya').style.display    = '';
+    if (kwh)  document.getElementById('rowJmlKwh').style.display       = '';
+    if (kt)   document.getElementById('rowKodeToken').style.display    = '';
+
+  } else if (activeTab === 'pasca') {
+    // ── PLN Pascabayar ──
+    const fNPP   = document.getElementById('fNamaPelangganPasca');
+    const fIPP   = document.getElementById('fIdPelPasca');
+    const fTDP   = document.getElementById('fTarifDayaPasca');
+    const fBulan = document.getElementById('fBulanPasca');
+    const fKWHP  = document.getElementById('fJmlKwhPasca');
+
+    const nama  = fNPP   ? fNPP.value.trim()   : '';
+    const idp   = fIPP   ? fIPP.value.trim()   : '';
+    const td    = fTDP   ? fTDP.value.trim()   : '';
+    const bulan = fBulan ? fBulan.value.trim() : '';
+    const kwh   = fKWHP  ? fKWHP.value.trim()  : '';
+
     wrapNominalTop.style.display   = '';
     wrapKodeTokenTop.style.display = 'none';
-    // Kembalikan label
-    if (lblNama) lblNama.textContent = 'Nama Penerima';
-    // Tampilkan baris yang tadi disembunyikan (sesuai isi)
-    const rek = fRekTujuan.value.trim();
-    const dr  = fDariRek.value.trim();
-    const br  = fBerita.value.trim();
-    document.getElementById('rowRekTujuan').style.display = rek ? '' : 'none';
-    document.getElementById('rowDariRek').style.display   = dr  ? '' : 'none';
-    document.getElementById('rowBerita').style.display    = br  ? '' : 'none';
+    if (lblNama) lblNama.textContent = 'Nama';
+
+    rNamaPenerima.textContent = nama  || '—';
+    rIdPel.textContent        = idp   || '—';
+    rTarifDaya.textContent    = td    || '—';
+    rJmlKwh.textContent       = bulan || '—';
+    rKodeToken.textContent    = kwh   ? (kwh + ' kWh') : '—';
+
+    // Gunakan baris yang ada dengan label dinamis
+    const lblIdPel    = document.querySelector('#rowIdPel .rl');
+    const lblJmlKwh   = document.querySelector('#rowJmlKwh .rl');
+    const lblKodeToken= document.querySelector('#rowKodeToken .rl');
+    if (lblIdPel)    lblIdPel.textContent    = 'No. Meter / IDPEL';
+    if (lblJmlKwh)   lblJmlKwh.textContent   = 'Tagihan Bulan';
+    if (lblKodeToken) lblKodeToken.textContent= 'Jumlah kWh';
+
+    if (nama)  document.getElementById('rowNamaPenerima').style.display = '';
+    if (idp)   document.getElementById('rowIdPel').style.display        = '';
+    if (td)    document.getElementById('rowTarifDaya').style.display    = '';
+    if (bulan) document.getElementById('rowJmlKwh').style.display       = '';
+    if (kwh)   document.getElementById('rowKodeToken').style.display    = '';
   }
 }
 
-[fNamaAgen,fStatus,fDatetime,fNamaPenerima,fRekTujuan,fNamaPengirim,fBankPengirim,fBankPenerima,fDariRek,fNoRef,fBerita,fNoMeter,fIdPel,fTarifDaya,fJmlKwh,fKodeToken]
-  .forEach(el => el.addEventListener('input', updateReceipt));
+[fNamaAgen,fStatus,fDatetime,fNominal,fNamaPenerima,fRekTujuan,fNamaPengirim,fBankPengirim,fBankPenerima,fDariRek,fNoRef,fBerita,fNoMeter,fIdPel,fTarifDaya,fJmlKwh,fKodeToken,fAdmin]
+  .forEach(el => { if(el) el.addEventListener('input', updateReceipt); });
+
+// Field tab token & pasca
+['fNamaPelangganToken','fNamaPelangganPasca','fIdPelPasca','fTarifDayaPasca','fBulanPasca','fJmlKwhPasca'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', updateReceipt);
+});
 
 // fJenis adalah <select> — gunakan 'change'
 fJenis.addEventListener('change', () => {
