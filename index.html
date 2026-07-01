@@ -310,6 +310,9 @@ body {
   .receipt-datetime { font-size: 10px !important; color: #000 !important; font-weight: 600 !important; margin-bottom: 6px !important; }
   .receipt-amount   { font-size: 18px !important; font-weight: 900 !important; color: #000 !important; }
 
+  /* Kode token PLN Prabayar — lebih besar, tidak terlalu tebal agar lebih jelas saat print */
+  #rKodeTokenTop { font-size: 20px !important; font-weight: 500 !important; letter-spacing: 2px !important; line-height: 1.5 !important; }
+
   .receipt-top {
     padding: 8px 8px 8px !important;
     border-bottom: 1.5px dashed #000 !important;
@@ -824,7 +827,7 @@ body {
               </div>
               <!-- Khusus token listrik: kode token tampil di posisi nominal besar -->
               <div class="receipt-amount-wrap" id="wrapKodeTokenTop" style="display:none;">
-                <div class="receipt-amount" id="rKodeTokenTop" style="font-size:18px;letter-spacing:1px;">—</div>
+                <div class="receipt-amount" id="rKodeTokenTop" style="font-size:22px;font-weight:500;letter-spacing:2px;line-height:1.4;">—</div>
               </div>
             </div>
 
@@ -1132,7 +1135,7 @@ function updateReceipt() {
     if (idp)  document.getElementById('rowIdPel').style.display        = '';
     if (td)   document.getElementById('rowTarifDaya').style.display    = '';
     if (kwh)  document.getElementById('rowJmlKwh').style.display       = '';
-    if (kt)   document.getElementById('rowKodeToken').style.display    = '';
+    // rowKodeToken disembunyikan karena kode token sudah tampil di bagian atas struk
 
   } else if (activeTab === 'pasca') {
     // ── PLN Pascabayar ──
