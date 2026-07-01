@@ -839,7 +839,7 @@ body {
                 <span class="rv" id="rBankPenerima">—</span>
               </div>
               <div class="receipt-row" id="rowRekTujuan">
-                <span class="rl">Rekening Tujuan</span>
+                <span class="rl" id="lblRekTujuan">Rekening Tujuan</span>
                 <span class="rv" id="rRekTujuan">—</span>
               </div>
               <div class="receipt-row">
@@ -1097,6 +1097,11 @@ function updateReceipt() {
     if (bp)   document.getElementById('rowBankPengirim').style.display = '';
     if (dr)   document.getElementById('rowDariRek').style.display      = '';
     if (br)   document.getElementById('rowBerita').style.display       = '';
+
+    // Label dinamis: khusus DANA ganti "Rekening Tujuan" → "No. HP"
+    const lblRek = document.getElementById('lblRekTujuan');
+    const isDANAJenis = fJenis.value === 'Isi Ulang DANA';
+    if (lblRek) lblRek.textContent = isDANAJenis ? 'No. HP' : 'Rekening Tujuan';
 
   } else if (activeTab === 'token') {
     // ── Token Listrik ──
@@ -1671,6 +1676,51 @@ function parseOCR(text) {
     r.rekTujuan = r.idPel || r.noMeter || '';
   }
 
+  // ══════════════════════════════════════════════
+  // STRUK ISI ULANG DANA (e-wallet) — dari DANA app
+  // Layout: "Isi Saldo Pelanggan RpXXX NamaPenerima - 08xxxxxxxx"
+  //         "ID DANA 0838....5228"  "ID Transaksi 202606..."
+  // ══════════════════════════════════════════════
+  const isDANA = /\bDANA\b/i.test(full) && /Isi\s*Saldo\s*Pelanggan|Isi\s*Ulang\s*DANA/i.test(full);
+  if (isDANA) {
+    // Tanggal & waktu: "12 Jun 2026 • 22:18" — OCR bisa baca • sebagai +, «, ·, dll
+    const dtM = full.match(/(\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4})\s*[•«·+\-|]\s*(\d{2}:\d{2})/i);
+    if (dtM) r.datetime = dtM[1] + ' ' + dtM[2];
+
+    // ID Transaksi → No. Ref (format bisa ada noise seperti @@ di depan, spasi di tengah)
+    const idTrxM = full.match(/ID\s*Transaksi\s+[^0-9]*([\d\s]{10,})/i);
+    if (idTrxM) r.noRef = idTrxM[1].replace(/\s+/g,'').trim();
+
+    // Nominal dari "Total Bayar Rp57.000" atau "Jumlah Isi Saldo Rp57.000"
+    const nomM = full.match(/(?:Total\s*Bayar|Jumlah\s*Isi\s*Saldo)\s*(?:Rp|IDR)\.?\s*([\d.,]+)/i);
+    if (nomM) r.nominal = parseNominalStr(nomM[1]);
+
+    // Nama & nomor HP penerima dari "Isi Saldo Pelanggan RpXXX NamaPenerima - 08xxxxxxxx"
+    const isiBaris = full.match(/Isi\s*Saldo\s*Pelanggan\s*(?:Rp|IDR)[\d.,]+\s+(.+?)\s*[-–]\s*(0\d{8,12})/i);
+    if (isiBaris) {
+      let rawNama = isiBaris[1].trim().replace(/\s+/g,' ');
+      // OCR membaca • sensor DANA sebagai huruf berulang (e, a, dll)
+      // Format DANA asli: huruf pertama + ••• + huruf terakhir tiap kata
+      // mis. "Sesen Sueeeear" → "S•••n Su•••••ar"
+      const sensorNama = rawNama.split(' ').map(kata => {
+        if (kata.length <= 1) return kata;
+        if (kata.length === 2) return kata[0] + '•';
+        return kata[0] + '•'.repeat(kata.length - 2) + kata[kata.length - 1];
+      }).join(' ');
+      r.namaPenerima = sensorNama;
+      r.rekTujuan    = isiBaris[2].trim();
+    } else {
+      const hpM = full.match(/[-–]\s*(0\d{8,12})/);
+      if (hpM) r.rekTujuan = hpM[1].trim();
+    }
+
+    r.jenis = 'Isi Ulang DANA';
+    r.bankPenerima = '';
+    r.bankPengirim = '';
+    r.dariRek = '';
+    r._skipDariRek = true; // flag: jangan timpa dariRek di parsing umum
+  }
+
   // ── 3. NAMA PENERIMA ──
   // BCA: "Nama Penerima   SUMARNINGSIH"
   // BRI: label "Tujuan" kemudian baris berisi nama (semua kapital), lalu bank, lalu no rek
@@ -2160,7 +2210,7 @@ function parseOCR(text) {
     if (allNums.length) dariRek = allNums[0];
   }
 
-  if (dariRek) r.dariRek = dariRek.trim().replace(/\s+/g,' ');
+  if (dariRek && !r._skipDariRek) r.dariRek = dariRek.trim().replace(/\s+/g,' ');
 
   } // end if (bank !== 'MANDIRI') for dariRek
 
